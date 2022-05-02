@@ -84,13 +84,18 @@ istream& operator>>(istream& in, Event& op2)
 }
 
 //check for overlapping times (events w/ no gaps between do not count as overlapped)
+//DOES NOT check for strict containmnet
 bool Event::operator==(const Event& op2) const
 {
+	return (stop > op2.start and stop <= op2.stop)
+		or (stop > op2.start and start < op2.stop);
+	/* old
 	return (start >= op2.start and stop <= op2.stop) // 2 contains 1
 		or (start <= op2.start and stop >= op2.stop) // 1 contains 2
-		or (start <= op2.stop  and stop <= op2.stop and stop > op2.start) // 1 into 2
-		or (start >= op2.start and stop >= op2.stop and start < op2.stop);// 2 into 1
+		or (stop <= op2.stop and stop > op2.start) // 1 into 2
+		or (stop >= op2.stop and start < op2.stop);// 2 into 1
 	//make the 3rd anded condition >=/<= instead of >/< to include end-to-end events
+	*/
 }
 
 bool Event::operator!=(const Event& op2) const //see ==
@@ -100,22 +105,26 @@ bool Event::operator!=(const Event& op2) const //see ==
 
 bool Event::operator< (const Event& op2) const //op1 before 
 {
-	//TODO
+	return (stop < op2.start);
 }
 
 bool Event::operator<=(const Event& op2) const //op1 before  with overlap (?)
 {
-	//TODO
+	return (*this < op2)
+		or (*this == op2);
+	// old return (stop <= op2.stop and stop > op2.start);
 }
 
 bool Event::operator> (const Event& op2) const //op1 after 
 {
-	//TODO
+	return (start > op2.stop);
 }
 
 bool Event::operator>=(const Event& op2) const //op1 after  with overlap (?)
 {
-	//TODO
+	return (*this > op2)
+		or (*this == op2);
+	// old return (start >= op2.start and start < op2.stop);
 }
 
 /*		PUBLIC FUNCTIONS		*/
@@ -146,3 +155,16 @@ void Event::set_stop(string new_weekday, string new_time)
 	else
 		stop = new_stop;
 }
+
+/*	CLASS DINNER	*/ //TODO
+/*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
+/*		OPERATORS		*/
+/*		PUBLIC FUNCTIONS		*/
+/*	CLASS FLIGHT	*/ //TODO
+/*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
+/*		OPERATORS		*/
+/*		PUBLIC FUNCTIONS		*/
+/*	CLASS YOGA	*/ //TODO
+/*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
+/*		OPERATORS		*/
+/*		PUBLIC FUNCTIONS		*/
