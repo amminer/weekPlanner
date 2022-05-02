@@ -4,7 +4,6 @@
 #include<iostream>
 
 using namespace std;
-typedef unsigned short uint;
 
 /* Amelia Miner
  * 04/29/22
@@ -24,8 +23,8 @@ typedef unsigned short uint;
 class Event
 {
 	public:
-		Event(WeekdayTime strt, WeekdayTime stp, char* nm, char* lctn);
-		Event(const Event& cpy);
+		Event(WeekdayTime, WeekdayTime, string, string);
+		Event(const Event&);
 		~Event();
 
 		Event& operator=(const Event&); //called by copy constr

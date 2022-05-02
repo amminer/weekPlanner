@@ -1,6 +1,6 @@
 CFLAGS=     -g -Wall -std=c++17
 VFLAGS=		--leak-check=full
-SOURCES=	test_headers.cpp
+SOURCES=	./WeekdayTime.cpp ./test_weekdaytime.cpp
 EXE=     	./main.out
 CC=			g++
 
