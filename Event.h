@@ -1,7 +1,8 @@
 #pragma once
 
-#include"WeekdayTime.h"
-#include<iostream>
+#include "WeekdayTime.h"
+#include <cstring>
+#include <iostream>
 
 using namespace std;
 
@@ -22,15 +23,17 @@ using namespace std;
 
 class Event
 {
-	public:
-		Event(WeekdayTime, WeekdayTime, string, string);
+	public: //TODO prune
+		Event(void);
+		Event(string in_name, string in_loc);
+		Event(Weekday, int, int, Weekday, int, int, string, string);
 		Event(const Event&);
 		~Event();
 
 		Event& operator=(const Event&); //called by copy constr
 
 		bool operator==(const Event&) const; //check for overlapping times
-		bool operator!=(const Event&) const; //see above
+		bool operator!=(const Event&) const; //see ==
 		bool operator< (const Event&) const; //op1 before 
 		bool operator<=(const Event&) const; //op1 before  with overlap (?)
 		bool operator> (const Event&) const; //op1 after 
@@ -39,11 +42,19 @@ class Event
 		friend ostream& operator<<(ostream&, const Event&);
 		friend istream& operator>>(istream&, Event&);
 
+		void set_name(string); //wrapper for set_name(const char*)
+		void set_start(string, string);
+		void set_stop(string, string);
+
 	private:
 		WeekdayTime start;
 		WeekdayTime stop;
 		char* name;			//requirements list an inherited char*
 		string location;
+		string event_type;
+
+		char* to_dyn_charp(const string) const; //used to translate string i/o; calls new
+		void set_name(const char*); //used by copy constructor to set name
 };
 
 class Dinner; //Flight depends on Dinner - further declared below

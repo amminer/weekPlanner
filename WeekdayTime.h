@@ -1,6 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <exception>
+#include <locale>
+#include <sstream>
+#include <regex>
 
 using namespace std;
 typedef unsigned int uint;
@@ -18,14 +22,29 @@ typedef unsigned int uint;
  *					class Event.
  */
 
+struct start_greater_than_stop:	public exception {};
+struct stop_less_than_start:	public exception {};
+struct string_is_not_weekday:	public exception {};
+struct string_is_not_time:		public exception {};
+
 //week starts on Sunday, should maybe change to monday? Going to be important later
 enum Weekday{sunday, monday, tuesday, wednesday, thursday, friday, saturday};
 
+//weekday-related functions in global namespace
+string weekday_to_string(const Weekday);
+Weekday string_to_weekday(const string);
+uint hhmm_to_m(int, int);
+string m_to_hhmm(uint, int=0);
+uint string_to_m(string);
+
 class WeekdayTime
 {
-	public:
+	public: //TODO prune
+		WeekdayTime(void);
 		WeekdayTime(Weekday, int);
 		WeekdayTime(Weekday, int, int);
+		WeekdayTime(string, int);
+		WeekdayTime(string, int, int);
 
 		bool operator==(const WeekdayTime&) const; //check for overlapping times
 		bool operator!=(const WeekdayTime&) const; //see above
@@ -36,10 +55,6 @@ class WeekdayTime
 
 		friend ostream& operator<<(ostream&, const WeekdayTime&);
 		friend istream& operator>>(istream&, WeekdayTime&);
-
-		uint hhmm_to_m(int, int) const;
-		string m_to_hhmm(uint, int=0) const;
-		string weekday_to_string(Weekday) const;
 
 	private:
 		Weekday weekday;

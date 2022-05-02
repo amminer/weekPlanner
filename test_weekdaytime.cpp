@@ -14,7 +14,7 @@ void compare(WeekdayTime a, WeekdayTime b)
 int main(void)
 {
 
-auto test1 {WeekdayTime(sunday, 10, 30)};
+auto test1 {WeekdayTime(string_to_weekday("Sunday"), 10, 30)};
 auto test2 {WeekdayTime(tuesday, 14, 45)};
 auto test3 {WeekdayTime(tuesday, 13, 0)};
 
