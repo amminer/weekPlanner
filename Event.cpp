@@ -13,24 +13,29 @@
 /*	CLASS EVENT	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 
+//initializes the new event for setup
+//important that start and stop are at their lower and upper limits respectively!
 Event::Event(void)
-	: name(nullptr) {}
+	: start(WeekdayTime(sunday, 0, 0)),
+	  stop(WeekdayTime(saturday, 24, 59)),
+	  name(nullptr), location("NOT SET"), event_type("event") {}
+//do not call setup from constructor - allow consuming code to decide what i/o
 
-Event::Event(string in_name, string in_loc)
+Event::Event(string in_name, string in_loc) //testing, will probably remove TODO
 	: start(WeekdayTime(sunday, 0, 0)),
 	  stop(WeekdayTime(saturday, 24, 59)),
 	  name(to_dyn_charp(in_name)), location(in_loc), event_type("event") {}
 
-Event::Event(Weekday in_start_day, int in_start_hour, int in_start_min,
+Event::Event(Weekday in_start_day, int in_start_hour, int in_start_min, //testing, will probably remove TODO
 			 Weekday in_stop_day,  int in_stop_hour,  int in_stop_min,
 			 string in_name, string in_loc)
 	: start(WeekdayTime(in_start_day, in_start_hour, in_start_min)),
 	  stop( WeekdayTime(in_stop_day,  in_stop_hour,  in_stop_min )),
 	  name(to_dyn_charp(in_name)), location(in_loc), event_type("event") {}
-//WARNING calls new; converts a string to a new dynamic cstring
+//WARNING calls new; converts a std::string to a new dynamic cstring for constr //TODO probably remove
 char* Event::to_dyn_charp(const string in_str) const
 {
-	char* new_cstring = new char[in_str.length() + 1]; //+1 for null term
+	char* new_cstring = new char[in_str.length() + 1];
 	strcpy(new_cstring, in_str.c_str());
 	return new_cstring;
 }
@@ -54,6 +59,42 @@ Event::~Event(void)
 {
 	if (name)
 		delete [] name;
+}
+
+/*		PRIVATE FUNCTIONS		*/
+//(currently these are just for use in setup)
+//Wrapper to set_name(char*)
+void Event::set_name(string in_name)
+{
+	set_name(in_name.c_str());
+}
+
+//Enforces start <= stop
+void Event::set_start(string new_weekday, string new_time)
+{
+	WeekdayTime new_start {
+		WeekdayTime(string_to_weekday(new_weekday),
+					 string_to_min(new_time)) };
+	if (new_start > stop){
+		stringstream message;
+		message << new_start << " > " << stop;
+		string message_str = message.str(); //pass by ref
+		throw start_greater_than_stop(message_str);
+	}
+	else
+		start = new_start;
+}
+
+//Enforces stop >= start
+void Event::set_stop(string new_weekday, string new_time)
+{
+	WeekdayTime new_stop {
+		WeekdayTime(string_to_weekday(new_weekday),
+					 string_to_min(new_time)) };
+	if (new_stop < start)
+		throw stop_less_than_start();
+	else
+		stop = new_stop;
 }
 
 /*		OPERATORS		*/
@@ -83,7 +124,7 @@ istream& operator>>(istream& in, Event& op2)
 	return in;
 }
 
-//check for overlapping times (events w/ no gaps between do not count as overlapped)
+//Check for overlapping times (events w/ no gaps between do not count as overlapped)
 //DOES NOT check for strict containment - no need for this behavior for now
 bool Event::operator==(const Event& op2) const
 {
@@ -128,32 +169,98 @@ bool Event::operator>=(const Event& op2) const //op1 after  with overlap (?)
 }
 
 /*		PUBLIC FUNCTIONS		*/
-
-void Event::set_name(string in_name)
+//	Used by client code to initialize the values of an event from cin
+//all function-scope variables used to catch input are passed in as arguments
+//with a default value of "_" to detect whether there was previous input.
+//	*Some arguments are never passed explicitly in this implementation,
+//but are still declared as arguments for ease of maintenance should new
+//functionality need to be implemented.
+bool Event::setup_from_cin(string new_name,		string new_loc,
+						   string startweekday,	string starttime,
+						   string stopweekday,	string stoptime)
 {
-	set_name(in_name.c_str());
-}
+	bool ret {true};
+	try{
+		if (new_name == "_"){
+			cout << "Enter a name {!q to quit}: ";
+			getline(cin, new_name); //not validated
+			if (new_name == "!q") ret = false;
+			else set_name(new_name); //no validation needed but must convert str to cstr
+		}
+		if (new_loc == "_" and ret){
+			cout << "Enter a location {!q to quit}: ";
+			getline(cin, new_loc); //not validated
+			if (new_loc == "!q") ret = false;
+			else location = new_loc; //data type matches and no validation needed
+		}
+		if ((startweekday == "_" or starttime == "_") and ret){
+			cout << "When does \"" << name << "\" start?\n";
+		}
+		if (startweekday == "_" and ret){
+			cout << "Day of week {!q to quit}: ";
+			getline(cin, startweekday);
+			if (startweekday == "!q") ret = false;
+			else{
+				//TODO slightly inefficient (extra instantiation of weekdaytime)
+				set_start(startweekday, "0:00"); //validates weekday before asking for time
+				
+				cout << "Time {24h, h:m, !q to quit}: ";
+				getline(cin, starttime);
+			}
+			if (starttime == "!q" or !ret) ret = false;
+			else set_start(startweekday, starttime); //validates time
+		}
+		if ((stopweekday == "_" or stoptime == "_") and ret){
+			cout << "When does \"" << name << "\" stop?\n";
+		}
+		if (stopweekday == "_" and ret){
+			cout << "Day of week {!q to quit}: ";
+			getline(cin, stopweekday);
+			if (stopweekday == "!q") ret = false;
+			else{
+				//TODO slightly inefficient (extra instantiation of weekdaytime)
+				set_stop(stopweekday, starttime); //validates weekday before asking for time
+				cout << "Time {24h, h:m, !q to quit}: ";
+				getline(cin, stoptime);
+			}
+			if (stoptime == "!q" or !ret) ret = false;
+			else set_stop(stopweekday, stoptime); //validates time
+		}
+	}
 
-void Event::set_start(string new_weekday, string new_time)
-{
-	auto new_start {
-		WeekdayTime(string_to_weekday(new_weekday),
-					 string_to_m(new_time)) };
-	if (new_start > stop)
-		throw start_greater_than_stop();
-	else
-		start = new_start;
-}
+	catch (const string_is_not_weekday& time_error){
+		if (time_error.message != ""){
+			cout << time_error.message;
+		}
+		else{
+			cout << "That ";
+		}
+		cout << " is not a valid weekday!\nPlease try again.\n";
+		return setup_from_cin(name, location);
+	}
 
-void Event::set_stop(string new_weekday, string new_time)
-{
-	auto new_stop {
-		WeekdayTime(string_to_weekday(new_weekday),
-					 string_to_m(new_time)) };
-	if (new_stop < start)
-		throw stop_less_than_start();
-	else
-		stop = new_stop;
+	catch (const string_is_not_time& time_error){
+		if (time_error.message != ""){
+			cout << time_error.message << ' ';
+		}
+		else{
+			cout << "That ";
+		}
+		cout << " is not a valid time!\nPlease try again.\n";
+		return setup_from_cin(name, location);
+	}
+
+	catch (const time_exception& time_error){
+		cout << "Start day & time must be less than or equal to stop day & time!\n"
+		 	 << time_error.message << '\n';
+		cout << "Please try again.\n";
+		if (stopweekday == "_") //Only works because we ask for start then stop
+			return setup_from_cin(name, location, startweekday);
+		else
+			return setup_from_cin(name, location, startweekday, starttime, stopweekday);
+	}
+
+	return ret;
 }
 
 /*	CLASS FLIGHT	*/ //TODO

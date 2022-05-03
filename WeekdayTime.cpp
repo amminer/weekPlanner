@@ -12,6 +12,32 @@
  *					and associated functions.
  */
 
+/*	I/O EXCEPTIONS	*/
+time_exception::time_exception(void)
+	: message("") {}
+time_exception::time_exception(const string& new_message)
+	: message(new_message) {}
+
+start_greater_than_stop::start_greater_than_stop(void)
+	: message("") {}
+start_greater_than_stop::start_greater_than_stop(const string& new_message)
+	: message(new_message) {}
+
+stop_less_than_start::stop_less_than_start(void)
+	: message("") {}
+stop_less_than_start::stop_less_than_start(const string& new_message)
+	: message(new_message) {}
+
+string_is_not_weekday::string_is_not_weekday(void)
+	: message("") {}
+string_is_not_weekday::string_is_not_weekday(const string& new_message)
+	: message(new_message) {}
+
+string_is_not_time::string_is_not_time(void)
+	: message("") {}
+string_is_not_time::string_is_not_time(const string& new_message)
+	: message(new_message) {}
+
 /*		PUBLIC, GLOBAL FUNCTIONS		*/
 
 string weekday_to_string(const Weekday day)
@@ -36,6 +62,7 @@ string weekday_to_string(const Weekday day)
 	}
 }
 
+//TODO allow abbreviations
 Weekday string_to_weekday(const string day)
 {
 	stringstream lowercase_day;
@@ -58,17 +85,18 @@ Weekday string_to_weekday(const string day)
 	else if (cleaned_day == "saturday")
 		return saturday;
 	else
-		throw string_is_not_weekday();
+		throw string_is_not_weekday(day);
 }
 
-uint string_to_m(string timestring)
+//TODO allow 12-hour format
+uint string_to_min(string timestring)
 {
 	regex pattern {"([0]?[0-9]|[1][0-9]|[2][0-3]):([0-5]?[0-9])"};
 	smatch sm;
 	if (regex_match(timestring, sm, pattern); sm.size() == 3)
 		return hhmm_to_m(stoi(sm[1]), stoi(sm[2]));
 	else
-		throw string_is_not_time();
+		throw string_is_not_time(timestring);
 }
 
 uint hhmm_to_m(int hr, int min)

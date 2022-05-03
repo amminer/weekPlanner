@@ -1,4 +1,6 @@
-Implement event (still working on derived classes)
+Implement event (still working on derived classes, UI setup function)
+	+ make setup_from_cin return to the exact correct point in the prompts when it catches a time_exception
+	  (currently jumps back to weekday input even if it should already know the weekday chosen)
 
 Finish headers (shouldn't be too bad, but want to wait until events are implemented)
 
@@ -6,6 +8,6 @@ Implement eventlist (one week long, maintains non-overlap of all contained event
 
 Implement planner (keeps a collection of eventlists to represent upcoming weeks in chronological order)
 
-Convert Node and DLL to use unique_ptr
+Convert Node and DLL to use unique_ptr (can't blame me for importing these from last assignment)
 
 Convert event to use unique_ptr (whoops! Force of habit)

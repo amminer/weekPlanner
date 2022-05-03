@@ -24,33 +24,14 @@ void compare_gele(const Event& a, const Event& b)
 	cout << '\n';
 }
 
+/* should note the format of desired input in docstring */
 void test_add_event(void)
 {
-	string name, loc, startweekday, stopweekday, starttime, stoptime;
-	cout << "Adding new event...\n"
-		 << "Enter a name: ";
-	getline(cin, name);
-	cout << "Enter a location: ";
-	getline(cin, loc);
-	auto new_event {Event(name, loc)};
-
-	cout << "When does it start?\n"
-		 << "Day of week: ";
-	getline(cin, startweekday);
-	new_event.set_start(startweekday, "0:00"); //error checking
-	cout << "Time: ";
-	getline(cin, starttime);
-	new_event.set_start(startweekday, starttime); //actual value
-
-	cout << "When does it stop?\n"
-		 << "Day of week: ";
-	getline(cin, stopweekday);
-	new_event.set_stop(stopweekday, starttime); //error checking
-	cout << "Time: ";
-	getline(cin, stoptime);
-	new_event.set_stop(stopweekday, stoptime); //actual value
-
-	cout << "Your new event:\n" << new_event << '\n';
+	Event an_event;
+	if (an_event.setup_from_cin())
+	{
+		cout << "Your new event:\n" << an_event << '\n';
+	}
 }
 
 void test_comparative_ops(void)
@@ -91,7 +72,8 @@ int main(void)
 Event q = Event(monday, 12, 30, wednesday, 8, 20, "test", "test2");
 //moment event
 Event w = Event(tuesday, 10, 5, tuesday, 10, 5, "test3", "test4");
-//test_add_event();
-test_comparative_ops();
+
+test_add_event();
+//test_comparative_ops();
 
 }

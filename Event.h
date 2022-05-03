@@ -3,6 +3,7 @@
 #include "WeekdayTime.h"
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -42,9 +43,8 @@ class Event
 		friend ostream& operator<<(ostream&, const Event&); // display
 		friend istream& operator>>(istream&, Event&); // wrapper for setup
 
-		void set_name(string); //wrapper for set_name(const char*)
-		void set_start(string, string);
-		void set_stop(string, string);
+		//called from top level UI code to prompt user
+		bool setup_from_cin(string="_", string="_", string="_", string="_", string="_", string="_");
 
 	private:
 		WeekdayTime start;
@@ -54,8 +54,11 @@ class Event
 		string event_type;
 
 		char* to_dyn_charp(const string) const; //used to translate string i/o; calls new
-		void set_name(const char*); //used by copy constructor to set name
-		void setup(Weekday, string, Weekday, string, string, string); //TODO recursive UI func
+		//validation/setter functions called by setup func(s)
+		void set_name(const char*); //also used by copy constructor
+		void set_name(string); //wrapper for set_name(const char*)
+		void set_start(string, string);
+		void set_stop(string, string);
 };
 
 class Dinner; //Flight depends on Dinner - further declared below
