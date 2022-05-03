@@ -72,10 +72,10 @@ void test_comparative_ops(void)
 					 "Citywide Rager", "base is ==/<=")};
 	//<
 	auto test6 {Event(saturday, 10, 30, saturday, 11, 10,
-					 "Universally Lit National Holiday", "base is <")};
+					 "Universally Lit National Holiday", "base is >")};
 	//>
 	auto test7 {Event(saturday, 15, 30, saturday, 18, 10,
-					 "Apocalyptic Shindig", "base is >")};
+					 "Apocalyptic Shindig", "base is <")};
 
 	list<Event> events {test2, test3, test4, test5, test6, test7};
 	for (Event other: events){

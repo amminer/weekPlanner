@@ -84,12 +84,12 @@ istream& operator>>(istream& in, Event& op2)
 }
 
 //check for overlapping times (events w/ no gaps between do not count as overlapped)
-//DOES NOT check for strict containmnet
+//DOES NOT check for strict containment - no need for this behavior for now
 bool Event::operator==(const Event& op2) const
 {
 	return (stop > op2.start and stop <= op2.stop)
 		or (stop > op2.start and start < op2.stop);
-	/* old
+	/* old - keeping in case bugs appear, but tested new code thoroughly and pretty sure this code sucks
 	return (start >= op2.start and stop <= op2.stop) // 2 contains 1
 		or (start <= op2.start and stop >= op2.stop) // 1 contains 2
 		or (stop <= op2.stop and stop > op2.start) // 1 into 2
@@ -156,11 +156,11 @@ void Event::set_stop(string new_weekday, string new_time)
 		stop = new_stop;
 }
 
-/*	CLASS DINNER	*/ //TODO
+/*	CLASS FLIGHT	*/ //TODO
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 /*		OPERATORS		*/
 /*		PUBLIC FUNCTIONS		*/
-/*	CLASS FLIGHT	*/ //TODO
+/*	CLASS DINNER	*/ //TODO
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 /*		OPERATORS		*/
 /*		PUBLIC FUNCTIONS		*/

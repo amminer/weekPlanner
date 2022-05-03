@@ -23,9 +23,9 @@ using namespace std;
 
 class Event
 {
-	public: //TODO prune
-		Event(void);
-		Event(string in_name, string in_loc);
+	public: //TODO decide on UI implementation and prune for this + all derived classes
+		Event(void); //will probably stick with this and call a setup function from within
+		Event(string, string); //instead of calling one of these then using public setters
 		Event(Weekday, int, int, Weekday, int, int, string, string);
 		Event(const Event&);
 		~Event();
@@ -39,8 +39,8 @@ class Event
 		bool operator> (const Event&) const; //op1 after 
 		bool operator>=(const Event&) const; //op1 after  with overlap (?)
 
-		friend ostream& operator<<(ostream&, const Event&);
-		friend istream& operator>>(istream&, Event&);
+		friend ostream& operator<<(ostream&, const Event&); // display
+		friend istream& operator>>(istream&, Event&); // wrapper for setup
 
 		void set_name(string); //wrapper for set_name(const char*)
 		void set_start(string, string);
@@ -55,13 +55,16 @@ class Event
 
 		char* to_dyn_charp(const string) const; //used to translate string i/o; calls new
 		void set_name(const char*); //used by copy constructor to set name
+		void setup(Weekday, string, Weekday, string, string, string); //TODO recursive UI func
 };
 
 class Dinner; //Flight depends on Dinner - further declared below
 class Flight: public Event
 {
 	public:
-		Flight(WeekdayTime strt, WeekdayTime stp, char* nm, char* lctn); //TODO
+		Flight(void);
+		Flight(string, string); //TODO probably going to use this UI implementation
+		Flight(Weekday, int, int, Weekday, int, int, string, string);
 		//combines times, results in name "<flightname> + dinner for <dinnersz>"
 		Flight operator+(const Dinner&) const; 
 		Flight& operator+=(const Dinner&);
@@ -75,7 +78,9 @@ class Flight: public Event
 class Dinner: public Event
 {
 	public:
-		Dinner(WeekdayTime strt, WeekdayTime stp, char* nm, char* lctn); //TODO
+		Dinner(void);
+		Dinner(string, string); //TODO probably going to use this UI implementation
+		Dinner(Weekday, int, int, Weekday, int, int, string, string);
 		// combines times, results in name "<dinnername> + flight to <flightdest>"
 		Dinner operator+(const Flight&) const;
 		Dinner& operator+=(const Flight&);
@@ -88,7 +93,10 @@ class Dinner: public Event
 class Yoga: public Event
 {
 	public:
-		Yoga(WeekdayTime strt, WeekdayTime stp, char* nm, char* lctn); //TODO
+		Yoga(void); // will probably stick with this and call a setup function from within
+		Yoga(string, string); //instead of calling one of these then using public setters
+		//but I may end up using (string, string) since name and location are not validated inputs
+		Yoga(Weekday, int, int, Weekday, int, int, string, string);
 
 	private:
 		uint resting_heart_rate;		//safety reasons

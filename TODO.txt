@@ -1,7 +1,11 @@
-Finish headers
+Implement event (still working on derived classes)
 
-Implementing events
+Finish headers (shouldn't be too bad, but want to wait until events are implemented)
 
-Implement eventlist
+Implement eventlist (one week long, maintains non-overlap of all contained events. Rename?)
 
-Implement planner
+Implement planner (keeps a collection of eventlists to represent upcoming weeks in chronological order)
+
+Convert Node and DLL to use unique_ptr
+
+Convert event to use unique_ptr (whoops! Force of habit)
