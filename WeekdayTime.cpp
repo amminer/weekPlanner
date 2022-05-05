@@ -13,30 +13,20 @@
  */
 
 /*	I/O EXCEPTIONS	*/
-time_exception::time_exception(void)
-	: message("") {}
 time_exception::time_exception(const string& new_message)
-	: message(new_message) {}
-
-start_greater_than_stop::start_greater_than_stop(void)
-	: message("") {}
-start_greater_than_stop::start_greater_than_stop(const string& new_message)
-	: message(new_message) {}
-
-stop_less_than_start::stop_less_than_start(void)
-	: message("") {}
+	: runtime_error(new_message) {}
+//inherits time_exception
+start_greater_than_stop::start_greater_than_stop(const string& new_message)	
+	: time_exception(new_message) {}
+//inherits time_exception
 stop_less_than_start::stop_less_than_start(const string& new_message)
-	: message(new_message) {}
+	: time_exception(new_message) {}
 
-string_is_not_weekday::string_is_not_weekday(void)
-	: message("") {}
 string_is_not_weekday::string_is_not_weekday(const string& new_message)
-	: message(new_message) {}
+	: runtime_error(new_message) {}
 
-string_is_not_time::string_is_not_time(void)
-	: message("") {}
 string_is_not_time::string_is_not_time(const string& new_message)
-	: message(new_message) {}
+	: runtime_error(new_message) {}
 
 /*		PUBLIC, GLOBAL FUNCTIONS		*/
 

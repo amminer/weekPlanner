@@ -23,43 +23,33 @@ typedef unsigned int uint;
  */
 
 /*	exceptions used for I/O handling	*/
+//inherit from runtime_error, subtypes all in block below hub exception
 
 //superclass to catch either subclass of error
-struct time_exception: public exception
+struct time_exception: public runtime_error
 {
-	time_exception(void);
-	time_exception(const string& new_message);
-	const string message;
+	time_exception(const string& new_message="");
 };
-
+//inherits time_exception
 struct start_greater_than_stop: public time_exception
 {
-	start_greater_than_stop(void);
-	start_greater_than_stop(const string& new_message);
-	const string message;
+	start_greater_than_stop(const string& new_message="");
 };
-
+//inherits time_exception
 struct stop_less_than_start: public time_exception
 {
-	stop_less_than_start(void);
-	stop_less_than_start(const string& new_message);
-	const string message;
+	stop_less_than_start(const string& new_message="");
 };
 
-struct string_is_not_weekday: public exception
+struct string_is_not_weekday: public runtime_error
 {
-	string_is_not_weekday(void);
-	string_is_not_weekday(const string& new_message);
-	const string message;
+	string_is_not_weekday(const string& new_message="");
 };
 
-struct string_is_not_time: public exception
+struct string_is_not_time: public runtime_error
 {
-	string_is_not_time(void);
-	string_is_not_time(const string& new_message);
-	const string message;
+	string_is_not_time(const string& new_message="");
 };
-
 
 //week starts on Sunday, should maybe change to monday? Going to be important later
 enum Weekday{sunday, monday, tuesday, wednesday, thursday, friday, saturday};
@@ -67,6 +57,7 @@ enum Weekday{sunday, monday, tuesday, wednesday, thursday, friday, saturday};
 //weekday-related functions in global namespace
 string weekday_to_string(const Weekday);
 Weekday string_to_weekday(const string);
+//TODO these ones can probably be private
 uint hhmm_to_m(int, int);
 string m_to_hhmm(uint, int=0);
 uint string_to_min(string);

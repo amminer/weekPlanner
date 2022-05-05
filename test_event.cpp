@@ -25,16 +25,42 @@ void compare_gele(const Event& a, const Event& b)
 }
 
 /* should note the format of desired input in docstring */
-void test_add_event(void)
+void test_add_event()
 {
-	Event an_event;
-	if (an_event.setup_from_cin())
-	{
-		cout << "Your new event:\n" << an_event << '\n';
+	string type;
+	bool event_set_up = false;
+	Event* finished_event = nullptr; //placeholder
+	cout << "(Options are flight, dinner, or yoga)\n"
+		 << "Choose an event type {!q to quit}: ";
+	getline(cin, type);
+	if (type == "!q")
+		return;
+	else if (type == "flight"){ //TODO exception handling/input validator function
+		dynamic_cast<Flight*>(finished_event);
+		finished_event = new Flight();
+		event_set_up = finished_event->setup_from_cin();
 	}
+	else if (type == "dinner"){
+		dynamic_cast<Dinner*>(finished_event);
+		finished_event = new Dinner();
+		event_set_up = finished_event->setup_from_cin();
+	}
+	else if (type == "yoga"){
+		dynamic_cast<Yoga*>(finished_event);
+		finished_event = new Yoga();
+		event_set_up = finished_event->setup_from_cin();
+	}
+	else{
+		cout <<"invalid input! Try again.\n";
+		test_add_event();
+	}
+	if (event_set_up)
+		cout << "Your new event:\n" << *finished_event << '\n';
+	if (finished_event) //free temporary mem
+		delete finished_event;
 }
 
-void test_comparative_ops(void)
+void test_comparative_ops(void) //still missing some edge cases...
 {
 	auto test {Event(saturday, 12, 30, saturday, 14, 45,
 					 "Big Event", "base")};

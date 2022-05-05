@@ -1,6 +1,8 @@
-Implement event (still working on derived classes, UI setup function)
+Implement event (still working on derived classes, some tweaks to UI setup function would be beneficial)
+	+ derived class setup & setter funcs (and exceptions...)
 	+ make setup_from_cin return to the exact correct point in the prompts when it catches a time_exception
 	  (currently jumps back to weekday input even if it should already know the weekday chosen)
+	+ STILL need to prune constructors now that I know how the UI is going to work for sure...
 
 Finish headers (shouldn't be too bad, but want to wait until events are implemented)
 
@@ -10,4 +12,10 @@ Implement planner (keeps a collection of eventlists to represent upcoming weeks 
 
 Convert Node and DLL to use unique_ptr (can't blame me for importing these from last assignment)
 
-Convert event to use unique_ptr (whoops! Force of habit)
+Convert event to use unique_ptr (whoops! Force of habit. Just one char*, shouldn't be that bad)
+
+
+RETROSPECTIVE
+
+Using strings for all user input and converting them to ints when and where it becomes useful has high overhead, but strong results for UX (imo)
+	Default args create a convention that tells programmers what the input will be converted to - good and bad, conventions are mental overhead

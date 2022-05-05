@@ -22,14 +22,22 @@ using namespace std;
  *				are for operator overloading practice.
  */
 
+/*	IO EXCEPTIONS	*/
+struct must_be_positive_int: public invalid_argument
+{
+	must_be_positive_int(const string& new_message="");
+};
+
 class Event
 {
-	public: //TODO decide on UI implementation and prune for this + all derived classes
-		Event(void); //will probably stick with this and call a setup function from within
-		Event(string, string); //instead of calling one of these then using public setters
-		Event(Weekday, int, int, Weekday, int, int, string, string);
+	public:
+		//this is the only constructor that will be called from the finished code
+		Event(string);			//delete other constrs? Would still be good for testing?
+		Event(void);			//for testing class functionality w/o all user input
+		Event(string, string);	//for testing class functionality w/o all user input
+		Event(Weekday, int, int, Weekday, int, int, string, string); //see above
 		Event(const Event&);
-		~Event();
+		virtual ~Event();
 
 		Event& operator=(const Event&); //called by copy constr
 
@@ -44,7 +52,11 @@ class Event
 		friend istream& operator>>(istream&, Event&); // wrapper for setup
 
 		//called from top level UI code to prompt user
-		bool setup_from_cin(string="_", string="_", string="_", string="_", string="_", string="_");
+		virtual bool setup_from_cin(string="_", string="_", string="_", string="_", string="_", string="_");
+
+	protected:
+		//used to translate string i/o; calls new; needed for init lists
+		char* to_dyn_charp(const string) const; //no ref arg, accepts literals
 
 	private:
 		WeekdayTime start;
@@ -53,7 +65,6 @@ class Event
 		string location;
 		string event_type;
 
-		char* to_dyn_charp(const string) const; //used to translate string i/o; calls new
 		//validation/setter functions called by setup func(s)
 		void set_name(const char*); //also used by copy constructor
 		void set_name(string); //wrapper for set_name(const char*)
@@ -66,15 +77,18 @@ class Flight: public Event
 {
 	public:
 		Flight(void);
-		Flight(string, string); //TODO probably going to use this UI implementation
-		Flight(Weekday, int, int, Weekday, int, int, string, string);
+		~Flight(void);
 		//combines times, results in name "<flightname> + dinner for <dinnersz>"
 		Flight operator+(const Dinner&) const; 
 		Flight& operator+=(const Dinner&);
 
+		bool setup_from_cin(string checked_in="-1", string carryon_in="-1");
 	private:
-		string destination;
-		uint num_bags;
+		int bags_checked;
+		int bags_carryon;
+
+		void set_bags_checked(int checked_in);
+		void set_bags_carryon(int carryon_in);
 };
 
 //Dinner depends on Flight - declared above.
@@ -82,26 +96,23 @@ class Dinner: public Event
 {
 	public:
 		Dinner(void);
-		Dinner(string, string); //TODO probably going to use this UI implementation
-		Dinner(Weekday, int, int, Weekday, int, int, string, string);
+		~Dinner(void);
 		// combines times, results in name "<dinnername> + flight to <flightdest>"
 		Dinner operator+(const Flight&) const;
 		Dinner& operator+=(const Flight&);
 
 	private:
-		uint num_diners;
+		int num_guests;
 		char* food_allergies;	//requirements list a derived char*
 };
 
 class Yoga: public Event
 {
 	public:
-		Yoga(void); // will probably stick with this and call a setup function from within
-		Yoga(string, string); //instead of calling one of these then using public setters
-		//but I may end up using (string, string) since name and location are not validated inputs
-		Yoga(Weekday, int, int, Weekday, int, int, string, string);
+		Yoga(void);
+		~Yoga(void);
 
 	private:
-		uint resting_heart_rate;		//safety reasons
-		uint skill_level;
+		int resting_heart_rate;		//safety reasons
+		int skill_level;
 };

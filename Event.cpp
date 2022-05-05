@@ -1,6 +1,7 @@
 #include "Event.h"
 
-/* Amelia Miner
+/* Ameli Miner
+nPolicy RemoteSigned -Scope CurrentUser'
  * 04/29/22
  * cs 202 section 003
  * PROGRAM #:	2
@@ -10,16 +11,27 @@
  *				and associated functions.
  */
 
+/*	IO EXCEPTIONS	*/
+must_be_positive_int::must_be_positive_int(const string& new_message)
+	: invalid_argument(new_message) {}
+
 /*	CLASS EVENT	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 
 //initializes the new event for setup
 //important that start and stop are at their lower and upper limits respectively!
-Event::Event(void)
+Event::Event(void) //TODO delete this constr, this is hub class, see next constructor & derived
 	: start(WeekdayTime(sunday, 0, 0)),
 	  stop(WeekdayTime(saturday, 24, 59)),
 	  name(nullptr), location("NOT SET"), event_type("event") {}
 //do not call setup from constructor - allow consuming code to decide what i/o
+
+//initializes the new event for setup
+//important that start and stop are at their lower and upper limits respectively!
+Event::Event(string type)
+	: start(WeekdayTime(sunday, 0, 0)),
+	  stop(WeekdayTime(saturday, 24, 59)),
+	  name(to_dyn_charp("NOT SET")), location("NOT SET"), event_type(type) {}
 
 Event::Event(string in_name, string in_loc) //testing, will probably remove TODO
 	: start(WeekdayTime(sunday, 0, 0)),
@@ -59,42 +71,6 @@ Event::~Event(void)
 {
 	if (name)
 		delete [] name;
-}
-
-/*		PRIVATE FUNCTIONS		*/
-//(currently these are just for use in setup)
-//Wrapper to set_name(char*)
-void Event::set_name(string in_name)
-{
-	set_name(in_name.c_str());
-}
-
-//Enforces start <= stop
-void Event::set_start(string new_weekday, string new_time)
-{
-	WeekdayTime new_start {
-		WeekdayTime(string_to_weekday(new_weekday),
-					 string_to_min(new_time)) };
-	if (new_start > stop){
-		stringstream message;
-		message << new_start << " > " << stop;
-		string message_str = message.str(); //pass by ref
-		throw start_greater_than_stop(message_str);
-	}
-	else
-		start = new_start;
-}
-
-//Enforces stop >= start
-void Event::set_stop(string new_weekday, string new_time)
-{
-	WeekdayTime new_stop {
-		WeekdayTime(string_to_weekday(new_weekday),
-					 string_to_min(new_time)) };
-	if (new_stop < start)
-		throw stop_less_than_start();
-	else
-		stop = new_stop;
 }
 
 /*		OPERATORS		*/
@@ -179,7 +155,7 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 						   string startweekday,	string starttime,
 						   string stopweekday,	string stoptime)
 {
-	bool ret {true};
+	bool ret {true}; //maybe should've started with false...
 	try{
 		if (new_name == "_"){
 			cout << "Enter a name {!q to quit}: ";
@@ -229,8 +205,8 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 	}
 
 	catch (const string_is_not_weekday& time_error){
-		if (time_error.message != ""){
-			cout << time_error.message;
+		if (*time_error.what() != '\0'){
+			cout << time_error.what();
 		}
 		else{
 			cout << "That ";
@@ -240,8 +216,8 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 	}
 
 	catch (const string_is_not_time& time_error){
-		if (time_error.message != ""){
-			cout << time_error.message << ' ';
+		if (*time_error.what() != '\0'){
+			cout << time_error.what() << ' ';
 		}
 		else{
 			cout << "That ";
@@ -252,26 +228,126 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 
 	catch (const time_exception& time_error){
 		cout << "Start day & time must be less than or equal to stop day & time!\n"
-		 	 << time_error.message << '\n';
+		 	 << time_error.what() << '\n';
 		cout << "Please try again.\n";
 		if (stopweekday == "_") //Only works because we ask for start then stop
 			return setup_from_cin(name, location, startweekday);
 		else
 			return setup_from_cin(name, location, startweekday, starttime, stopweekday);
 	}
-
-	return ret;
+	return ret; //compiler doesn't like when I put this in the try block, makes sense I guess
 }
+
+/*		PRIVATE FUNCTIONS		*/
+//(currently these are just for use in setup)
+//Wrapper to set_name(char*)
+void Event::set_name(string in_name)
+{
+	set_name(in_name.c_str());
+}
+
+//Enforces start <= stop
+void Event::set_start(string new_weekday, string new_time)
+{
+	WeekdayTime new_start {
+		WeekdayTime(string_to_weekday(new_weekday),
+					 string_to_min(new_time)) };
+	if (new_start > stop){
+		stringstream message;
+		message << new_start << " > " << stop;
+		string message_str = message.str(); //pass by ref
+		throw start_greater_than_stop(message_str);
+	}
+	else
+		start = new_start;
+}
+
+//Enforces stop >= start
+void Event::set_stop(string new_weekday, string new_time)
+{
+	WeekdayTime new_stop {
+		WeekdayTime(string_to_weekday(new_weekday),
+					 string_to_min(new_time)) };
+	if (new_stop < start)
+		throw stop_less_than_start();
+	else
+		stop = new_stop;
+}
+
 
 /*	CLASS FLIGHT	*/ //TODO
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
+//called from setup
+Flight::Flight(void)
+	: Event("flight"), bags_checked(-1), bags_carryon(-1) {}
+
+Flight::~Flight(void) {} //must overload virtual base destructor
+
 /*		OPERATORS		*/
+
 /*		PUBLIC FUNCTIONS		*/
+bool Flight::setup_from_cin(string checked_in, string carryon_in)
+{
+	bool ret {true};
+	ret = Event::setup_from_cin();
+	if (ret){ //guards against user quitting from event setup
+		try{
+			if (checked_in == "-1"){
+				cout << "Checked bags {!q to quit}: ";
+				getline(cin, checked_in);
+				if (checked_in == "!q") ret = false;
+				else set_bags_checked(stoi(checked_in)); //TODO throws on erroneous input
+			}
+			if (carryon_in == "-1" and ret){
+				cout << "Carry-on bags {!q to quit}: ";
+				getline(cin, carryon_in);
+				if (carryon_in == "!q") ret = false;
+				else set_bags_carryon(stoi(carryon_in)); //TODO throws on erroneous input
+			}
+		}
+
+		catch (invalid_argument& int_error){
+			cout << "Input be a positive whole number!\n"; //not specifying bags, flexible?
+			if (*int_error.what() != '\0')
+				cout << '(' << int_error.what() << " is not valid)\n";
+			cout << "Please try again.\n";
+			return Flight::setup_from_cin(checked_in, carryon_in);
+		}
+	}
+	return ret;
+}
+/*		PRIVATE FUNCTIONS		*/
+void Flight::set_bags_checked(int checked_in){
+	if (checked_in < 0)
+		throw must_be_positive_int(to_string(checked_in));
+	else
+		bags_checked = checked_in;
+}
+
+void Flight::set_bags_carryon(int carryon_in){
+	if (carryon_in < 0)
+		throw must_be_positive_int(to_string(carryon_in));
+	else
+		bags_carryon = carryon_in;
+}
+
 /*	CLASS DINNER	*/ //TODO
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
+Dinner::Dinner(void)
+	: Event("dinner"), num_guests(-1), food_allergies(to_dyn_charp("NOT SET")) {}
+
+Dinner::~Dinner(void)
+{
+	if (food_allergies)
+		delete [] food_allergies;
+}
 /*		OPERATORS		*/
 /*		PUBLIC FUNCTIONS		*/
 /*	CLASS YOGA	*/ //TODO
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
+Yoga::Yoga(void)
+	: Event("yoga"), resting_heart_rate(-1), skill_level(-1) {}
+
+Yoga::~Yoga(void) {} //must overload virtual base destructor
 /*		OPERATORS		*/
 /*		PUBLIC FUNCTIONS		*/
