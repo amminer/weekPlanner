@@ -17,34 +17,26 @@ must_be_positive_int::must_be_positive_int(const string& new_message)
 
 /*	CLASS EVENT	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
-
-//initializes the new event for setup
-//important that start and stop are at their lower and upper limits respectively!
-Event::Event(void) //TODO delete this constr, this is hub class, see next constructor & derived
+Event::Event(void)
 	: start(WeekdayTime(sunday, 0, 0)),
 	  stop(WeekdayTime(saturday, 24, 59)),
 	  name(nullptr), location("NOT SET"), event_type("event") {}
-//do not call setup from constructor - allow consuming code to decide what i/o
 
-//initializes the new event for setup
-//important that start and stop are at their lower and upper limits respectively!
+//Initializes the new event for setup.
+//Important that start and stop are at their lower and upper limits respectively!
+//(This is the constructor that is called from derived constructors)
 Event::Event(string type)
 	: start(WeekdayTime(sunday, 0, 0)),
 	  stop(WeekdayTime(saturday, 24, 59)),
 	  name(to_dyn_charp("NOT SET")), location("NOT SET"), event_type(type) {}
 
-Event::Event(string in_name, string in_loc) //testing, will probably remove TODO
-	: start(WeekdayTime(sunday, 0, 0)),
-	  stop(WeekdayTime(saturday, 24, 59)),
-	  name(to_dyn_charp(in_name)), location(in_loc), event_type("event") {}
-
-Event::Event(Weekday in_start_day, int in_start_hour, int in_start_min, //testing, will probably remove TODO
+//for testing class Event&derived, not for use in client code
+Event::Event(Weekday in_start_day, int in_start_hour, int in_start_min,
 			 Weekday in_stop_day,  int in_stop_hour,  int in_stop_min,
 			 string in_name, string in_loc)
 	: start(WeekdayTime(in_start_day, in_start_hour, in_start_min)),
 	  stop( WeekdayTime(in_stop_day,  in_stop_hour,  in_stop_min )),
 	  name(to_dyn_charp(in_name)), location(in_loc), event_type("event") {}
-//WARNING calls new; converts a std::string to a new dynamic cstring for constr //TODO probably remove
 char* Event::to_dyn_charp(const string in_str) const
 {
 	char* new_cstring = new char[in_str.length() + 1];
@@ -74,7 +66,6 @@ Event::~Event(void)
 }
 
 /*		OPERATORS		*/
-
 Event& Event::operator=(const Event& op2)
 {
 	set_name(op2.name);
@@ -106,13 +97,6 @@ bool Event::operator==(const Event& op2) const
 {
 	return (stop > op2.start and stop <= op2.stop)
 		or (stop > op2.start and start < op2.stop);
-	/* old - keeping in case bugs appear, but tested new code thoroughly and pretty sure this code sucks
-	return (start >= op2.start and stop <= op2.stop) // 2 contains 1
-		or (start <= op2.start and stop >= op2.stop) // 1 contains 2
-		or (stop <= op2.stop and stop > op2.start) // 1 into 2
-		or (stop >= op2.stop and start < op2.stop);// 2 into 1
-	//make the 3rd anded condition >=/<= instead of >/< to include end-to-end events
-	*/
 }
 
 bool Event::operator!=(const Event& op2) const //see ==
@@ -145,8 +129,8 @@ bool Event::operator>=(const Event& op2) const //op1 after  with overlap (?)
 }
 
 /*		PUBLIC FUNCTIONS		*/
-//	Used by client code to initialize the values of an event from cin
-//all function-scope variables used to catch input are passed in as arguments
+//	Used by client code to initialize the values of an event from cin.
+//	All function-scope variables used to catch input are passed in as args
 //with a default value of "_" to detect whether there was previous input.
 //	*Some arguments are never passed explicitly in this implementation,
 //but are still declared as arguments for ease of maintenance should new
@@ -156,6 +140,8 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 						   string stopweekday,	string stoptime)
 {
 	bool ret {true}; //maybe should've started with false...
+	string default_start = "00:00"; //used temporarily to check input
+	string default_stop  = "23:59";
 	try{
 		if (new_name == "_"){
 			cout << "Enter a name {!q to quit}: ";
@@ -177,9 +163,8 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 			getline(cin, startweekday);
 			if (startweekday == "!q") ret = false;
 			else{
-				//TODO slightly inefficient (extra instantiation of weekdaytime)
-				set_start(startweekday, "0:00"); //validates weekday before asking for time
-				
+				//slightly inefficient (extra instantiation of weekdaytime)...
+				//set_start(startweekday, default_start); //validates weekday before asking for time
 				cout << "Time {24h, h:m, !q to quit}: ";
 				getline(cin, starttime);
 			}
@@ -194,8 +179,8 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 			getline(cin, stopweekday);
 			if (stopweekday == "!q") ret = false;
 			else{
-				//TODO slightly inefficient (extra instantiation of weekdaytime)
-				set_stop(stopweekday, starttime); //validates weekday before asking for time
+				//slightly inefficient (extra instantiation of weekdaytime)...
+				//set_stop(stopweekday, default_stop); //validates weekday before asking for time
 				cout << "Time {24h, h:m, !q to quit}: ";
 				getline(cin, stoptime);
 			}
@@ -220,20 +205,18 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 			cout << time_error.what() << ' ';
 		}
 		else{
-			cout << "That ";
+			cout << "That";
 		}
 		cout << " is not a valid time!\nPlease try again.\n";
 		return setup_from_cin(name, location);
 	}
 
 	catch (const time_exception& time_error){
-		cout << "Start day & time must be less than or equal to stop day & time!\n"
-		 	 << time_error.what() << '\n';
+		cout << "Start day & time must be less than or equal to stop day & time!\n";
+		if (*time_error.what() != '\0')
+		 	 cout << time_error.what() << '\n';
 		cout << "Please try again.\n";
-		if (stopweekday == "_") //Only works because we ask for start then stop
-			return setup_from_cin(name, location, startweekday);
-		else
-			return setup_from_cin(name, location, startweekday, starttime, stopweekday);
+		return setup_from_cin(name, location);
 	}
 	return ret; //compiler doesn't like when I put this in the try block, makes sense I guess
 }
@@ -241,13 +224,13 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 /*		PRIVATE FUNCTIONS		*/
 //(currently these are just for use in setup)
 //Wrapper to set_name(char*)
-void Event::set_name(string in_name)
+void Event::set_name(string& in_name)
 {
 	set_name(in_name.c_str());
 }
 
 //Enforces start <= stop
-void Event::set_start(string new_weekday, string new_time)
+void Event::set_start(string& new_weekday, string& new_time)
 {
 	WeekdayTime new_start {
 		WeekdayTime(string_to_weekday(new_weekday),
@@ -263,59 +246,73 @@ void Event::set_start(string new_weekday, string new_time)
 }
 
 //Enforces stop >= start
-void Event::set_stop(string new_weekday, string new_time)
+void Event::set_stop(string& new_weekday, string& new_time)
 {
 	WeekdayTime new_stop {
 		WeekdayTime(string_to_weekday(new_weekday),
 					 string_to_min(new_time)) };
-	if (new_stop < start)
-		throw stop_less_than_start();
+	if (new_stop < start){
+		stringstream message;
+		message << new_stop << " < " << start;
+		string message_str = message.str(); //pass by ref
+		throw stop_less_than_start(message_str);
+	}
 	else
 		stop = new_stop;
 }
 
 
-/*	CLASS FLIGHT	*/ //TODO
+/*	CLASS FLIGHT	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
-//called from setup
 Flight::Flight(void)
 	: Event("flight"), bags_checked(-1), bags_carryon(-1) {}
 
 Flight::~Flight(void) {} //must overload virtual base destructor
 
 /*		OPERATORS		*/
+//+, += ?
+ostream& operator<<(ostream& out, const Flight& op2)
+{
+	out << static_cast<const Event&>(op2) << '\n';
+	out << "bags: " << op2.bags_checked << " checked, "
+		<< op2.bags_carryon << " carry-on";
+	return out;
+} 
 
 /*		PUBLIC FUNCTIONS		*/
-bool Flight::setup_from_cin(string checked_in, string carryon_in)
+//on bad input, does not currently reset to user's last correct input, can be implemented if desired
+//by changing how error is thrown/caught
+bool Flight::setup_from_cin(bool base_set, string checked_in, string carryon_in)
 {
 	bool ret {true};
-	ret = Event::setup_from_cin();
-	if (ret){ //guards against user quitting from event setup
+	if (!base_set) ret = Event::setup_from_cin();
+	if (ret){ //guards against user quitting from event::setup
 		try{
 			if (checked_in == "-1"){
 				cout << "Checked bags {!q to quit}: ";
 				getline(cin, checked_in);
 				if (checked_in == "!q") ret = false;
-				else set_bags_checked(stoi(checked_in)); //TODO throws on erroneous input
+				else set_bags_checked(stoi(checked_in));
 			}
 			if (carryon_in == "-1" and ret){
 				cout << "Carry-on bags {!q to quit}: ";
 				getline(cin, carryon_in);
 				if (carryon_in == "!q") ret = false;
-				else set_bags_carryon(stoi(carryon_in)); //TODO throws on erroneous input
+				else set_bags_carryon(stoi(carryon_in));
 			}
 		}
 
 		catch (invalid_argument& int_error){
-			cout << "Input be a positive whole number!\n"; //not specifying bags, flexible?
+			cout << "Input be zero or a positive whole number!\n"; //not specifying bags, flexible?
 			if (*int_error.what() != '\0')
 				cout << '(' << int_error.what() << " is not valid)\n";
 			cout << "Please try again.\n";
-			return Flight::setup_from_cin(checked_in, carryon_in);
+			return Flight::setup_from_cin(true);
 		}
 	}
 	return ret;
 }
+
 /*		PRIVATE FUNCTIONS		*/
 void Flight::set_bags_checked(int checked_in){
 	if (checked_in < 0)
@@ -331,7 +328,7 @@ void Flight::set_bags_carryon(int carryon_in){
 		bags_carryon = carryon_in;
 }
 
-/*	CLASS DINNER	*/ //TODO
+/*	CLASS DINNER	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 Dinner::Dinner(void)
 	: Event("dinner"), num_guests(-1), food_allergies(to_dyn_charp("NOT SET")) {}
@@ -342,12 +339,136 @@ Dinner::~Dinner(void)
 		delete [] food_allergies;
 }
 /*		OPERATORS		*/
+//+, += ?
+ostream& operator<<(ostream& out, const Dinner& op2)
+{
+	out << static_cast<const Event&>(op2) << '\n';
+	out << "guests: " << op2.num_guests << '\n'
+		<< "allergies: "  << op2.food_allergies;
+	return out;
+} 
+
 /*		PUBLIC FUNCTIONS		*/
-/*	CLASS YOGA	*/ //TODO
+//on bad input, does not currently reset to user's last correct input, can be implemented if desired
+//by changing how error is thrown/caught
+bool Dinner::setup_from_cin(bool base_set, string guests_in, string allergies_in)
+{
+	bool ret {true};
+	if (!base_set) ret = Event::setup_from_cin();
+	if (ret){ //guards against user quitting from event::setup
+		try{
+			if (guests_in == "-1"){
+				cout << "Number of guests {!q to quit}: ";
+				getline(cin, guests_in);
+				if (guests_in == "!q") ret = false;
+				else set_num_guests(stoi(guests_in));
+			}
+			if (allergies_in == "_" and ret){
+				cout << "Enter food allergies for your table(s)\n{!q to quit, enter if none}: ";
+				getline(cin, allergies_in);
+				if (allergies_in == "!q") ret = false;
+				else set_allergies(allergies_in);
+			}
+		}
+
+		catch (invalid_argument& int_error){
+			cout << "Input be a positive whole number!\n"; //not specifying bags, flexible?
+			if (*int_error.what() != '\0')
+				cout << '(' << int_error.what() << " is not valid)\n";
+			cout << "Please try again.\n";
+			guests_in = "-1"; 
+			return Dinner::setup_from_cin(true);
+		}
+	}
+	return ret;
+}
+
+/*		PRIVATE FUNCTIONS		*/
+void Dinner::set_allergies(string& allergies_in)
+{
+	if (allergies_in == "")
+		allergies_in = "None";
+	set_allergies(allergies_in.c_str());
+}
+void Dinner::set_allergies(const char* allergies_in)
+{
+	if (food_allergies)
+		delete [] food_allergies;
+	food_allergies = new char[strlen(allergies_in) + 1];
+	strcpy(food_allergies, allergies_in);
+}
+
+void Dinner::set_num_guests(int guests_in)
+{
+	if (guests_in < 0)
+		throw must_be_positive_int(to_string(guests_in));
+	else
+		num_guests = guests_in;
+}
+
+/*	CLASS YOGA	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 Yoga::Yoga(void)
 	: Event("yoga"), resting_heart_rate(-1), skill_level(-1) {}
 
 Yoga::~Yoga(void) {} //must overload virtual base destructor
+
 /*		OPERATORS		*/
+ostream& operator<<(ostream& out, const Yoga& op2)
+{
+	out << static_cast<const Event&>(op2) << '\n';
+	out << "resting heart rate: " << op2.resting_heart_rate << '\n'
+		<< "skill level: "  << op2.skill_level;
+	return out;
+} 
+
 /*		PUBLIC FUNCTIONS		*/
+//on bad input, does not currently reset to user's last correct input, can be implemented if desired
+//by changing how error is thrown/caught
+bool Yoga::setup_from_cin(bool base_set, string bpm_in, string skill_in)
+{
+	bool ret {true};
+	if (!base_set) ret = Event::setup_from_cin();
+	if (ret){ //guards against user quitting from event::setup
+		try{
+			if (bpm_in == "-1"){
+				cout << "Your resting heart rate {!q to quit}: ";
+				getline(cin, bpm_in);
+				if (bpm_in == "!q") ret = false;
+				else set_resting_heart_rate(stoi(bpm_in));
+			}
+			if (skill_in == "-1" and ret){
+				cout << "Your skill level from 1 to 10 {!q to quit}: ";
+				getline(cin, skill_in);
+				if (skill_in == "!q") ret = false;
+				else set_skill_level(stoi(skill_in));
+			}
+		}
+
+		catch (invalid_argument& int_error){
+			cout << "Input be a positive whole number!\n"; //not specifying bags, flexible?
+			if (*int_error.what() != '\0')
+				cout << '(' << int_error.what() << " is not valid)\n";
+			cout << "Please try again.\n";
+			return Yoga::setup_from_cin(true);
+		}
+	}
+	return ret;
+}
+
+/*		PRIVATE FUNCTIONS		*/
+void Yoga::set_resting_heart_rate(int bpm_in)
+{
+	if (bpm_in <=0)
+		throw must_be_positive_int(to_string(bpm_in));
+	else
+		resting_heart_rate = bpm_in;
+}
+
+void Yoga::set_skill_level(int skill_in)
+{
+	if (skill_in <= 0)
+		throw must_be_positive_int(to_string(skill_in));
+	else
+		skill_level = skill_in; //accepts braggart values (>10)
+}

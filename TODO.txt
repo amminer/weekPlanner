@@ -1,8 +1,4 @@
-Implement event (still working on derived classes, some tweaks to UI setup function would be beneficial)
-	+ derived class setup & setter funcs (and exceptions...)
-	+ make setup_from_cin return to the exact correct point in the prompts when it catches a time_exception
-	  (currently jumps back to weekday input even if it should already know the weekday chosen)
-	+ STILL need to prune constructors now that I know how the UI is going to work for sure...
+Write an insert_sorted function for the DLL (uses node->data and comparative op overloads (class event))
 
 Finish headers (shouldn't be too bad, but want to wait until events are implemented)
 

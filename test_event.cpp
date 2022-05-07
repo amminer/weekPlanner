@@ -25,39 +25,35 @@ void compare_gele(const Event& a, const Event& b)
 }
 
 /* should note the format of desired input in docstring */
+// may be doing this wrong: see
+// https://stackoverflow.com/questions/35102079/c-upcasting-and-downcasting
 void test_add_event()
 {
 	string type;
-	bool event_set_up = false;
-	Event* finished_event = nullptr; //placeholder
 	cout << "(Options are flight, dinner, or yoga)\n"
 		 << "Choose an event type {!q to quit}: ";
 	getline(cin, type);
 	if (type == "!q")
 		return;
 	else if (type == "flight"){ //TODO exception handling/input validator function
-		dynamic_cast<Flight*>(finished_event);
-		finished_event = new Flight();
-		event_set_up = finished_event->setup_from_cin();
+		Flight f = Flight();
+		if (f.setup_from_cin())
+			cout << "Your new event:\n" << f << '\n';
 	}
 	else if (type == "dinner"){
-		dynamic_cast<Dinner*>(finished_event);
-		finished_event = new Dinner();
-		event_set_up = finished_event->setup_from_cin();
+		Dinner d = Dinner();
+		if (d.setup_from_cin())
+			cout << "Your new event:\n" << d << '\n';
 	}
 	else if (type == "yoga"){
-		dynamic_cast<Yoga*>(finished_event);
-		finished_event = new Yoga();
-		event_set_up = finished_event->setup_from_cin();
+		Yoga y = Yoga();
+		if (y.setup_from_cin())
+			cout << "Your new event:\n" << y << '\n';
 	}
 	else{
 		cout <<"invalid input! Try again.\n";
 		test_add_event();
 	}
-	if (event_set_up)
-		cout << "Your new event:\n" << *finished_event << '\n';
-	if (finished_event) //free temporary mem
-		delete finished_event;
 }
 
 void test_comparative_ops(void) //still missing some edge cases...

@@ -67,9 +67,9 @@ class Event
 
 		//validation/setter functions called by setup func(s)
 		void set_name(const char*); //also used by copy constructor
-		void set_name(string); //wrapper for set_name(const char*)
-		void set_start(string, string);
-		void set_stop(string, string);
+		void set_name(string&); //wrapper for set_name(const char*)
+		void set_start(string&, string&);
+		void set_stop(string&, string&);
 };
 
 class Dinner; //Flight depends on Dinner - further declared below
@@ -78,11 +78,13 @@ class Flight: public Event
 	public:
 		Flight(void);
 		~Flight(void);
+
 		//combines times, results in name "<flightname> + dinner for <dinnersz>"
 		Flight operator+(const Dinner&) const; 
 		Flight& operator+=(const Dinner&);
+		friend ostream& operator<<(ostream&, const Flight&); // display
 
-		bool setup_from_cin(string checked_in="-1", string carryon_in="-1");
+		virtual bool setup_from_cin(bool base_set=false, string checked_in="-1", string carryon_in="-1");
 	private:
 		int bags_checked;
 		int bags_carryon;
@@ -97,13 +99,20 @@ class Dinner: public Event
 	public:
 		Dinner(void);
 		~Dinner(void);
+
 		// combines times, results in name "<dinnername> + flight to <flightdest>"
 		Dinner operator+(const Flight&) const;
 		Dinner& operator+=(const Flight&);
+		friend ostream& operator<<(ostream&, const Dinner&); // display
 
+		virtual bool setup_from_cin(bool base_set=false, string guests_in="-1", string allergies_in="_");
 	private:
 		int num_guests;
 		char* food_allergies;	//requirements list a derived char*
+
+		void set_num_guests(int guests_in);
+		void set_allergies(string& allergies_in);
+		void set_allergies(const char* allergies_in);
 };
 
 class Yoga: public Event
@@ -112,7 +121,13 @@ class Yoga: public Event
 		Yoga(void);
 		~Yoga(void);
 
+		friend ostream& operator<<(ostream&, const Yoga&); // display
+
+		virtual bool setup_from_cin(bool base_set=false, string bpm_in="-1", string skill_in="-1");
 	private:
 		int resting_heart_rate;		//safety reasons
 		int skill_level;
+
+		void set_resting_heart_rate(int bpm_in);
+		void set_skill_level(int skill_in);
 };
