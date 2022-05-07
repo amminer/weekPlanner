@@ -1,17 +1,13 @@
-Write an insert_sorted function for the DLL (uses node->data and comparative op overloads (class event))
-
-Finish headers (shouldn't be too bad, but want to wait until events are implemented)
-
 Implement eventlist (one week long, maintains non-overlap of all contained events. Rename?)
 
 Implement planner (keeps a collection of eventlists to represent upcoming weeks in chronological order)
 
 Convert Node and DLL to use unique_ptr (can't blame me for importing these from last assignment)
 
-Convert event to use unique_ptr (whoops! Force of habit. Just one char*, shouldn't be that bad)
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 RETROSPECTIVE
 
 Using strings for all user input and converting them to ints when and where it becomes useful has high overhead, but strong results for UX (imo)
 	Default args create a convention that tells programmers what the input will be converted to - good and bad, conventions are mental overhead
+	Smart pointers are very hard to understand... I kinda like managing memory, it's fun, gdb and valgrind are cool

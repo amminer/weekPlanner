@@ -1,4 +1,4 @@
-#include "WeekdayTime.h"
+#include "../WeekdayTime.h"
 #include <vector>
 
 void compare(WeekdayTime a, WeekdayTime b)

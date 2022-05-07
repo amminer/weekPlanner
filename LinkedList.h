@@ -1,6 +1,6 @@
 #pragma once 
 
-#include<iostream> //display contents of nodes
+#include <iostream> //display contents of nodes
 
 using namespace std;
 
@@ -54,6 +54,7 @@ class LLL
 		size_t length(void) const; //returns size of list
 		T& at(size_t index) const; //throws std::outofbounds if index is "
 		void push_back(const T& new_data); //adds to back of list
+		void insert_sorted(const T& new_data); //inserts into list using operator< on node.data
 		T* lookup(const T& key) const; //returns null if not found
 		bool remove(const T& to_remove); //returns whether successful
 		void display(bool indices=false) const; //displays all node contents
@@ -67,8 +68,11 @@ class LLL
 		void copy_all(Node<T>* src, Node<T>*& dest, Node<T>*& dest_tail, Node<T>* last_dest);
 		void remove_all(Node<T>* to_del); //called by destructor
 		void push_back(Node<T>* list, Node<T>* new_node); //called by public push_back()
+		void insert_sorted(Node<T>* list, Node<T>* new_node); //called by public insert_sorted()
 		Node<T>* find_node(Node<T>* list, const T& key) const; //called by lookup()
 		void remove_node(Node<T>* to_del); //called by remove(), remove_all()
 		//called by public display
 		void display(Node<T>* list, size_t this_index, bool indices=false) const;
 };
+
+#include "LinkedList.tpp" //or else linker errors

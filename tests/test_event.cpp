@@ -1,4 +1,4 @@
-#include "Event.h"
+#include "../Event.h"
 #include <list>
 
 void compare(const Event& a, const Event& b)

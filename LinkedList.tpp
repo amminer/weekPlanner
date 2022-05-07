@@ -1,4 +1,4 @@
-#pragma onc
+#pragma once
 
 #include "LinkedList.h"
 
@@ -192,6 +192,42 @@ void LLL<T>::push_back(Node<T>* list, Node<T>* new_node)
 	}
 	else
 		push_back(list->get_next(), new_node);
+}
+
+template<typename T>
+void LLL<T>::insert_sorted(const T& new_data)
+{
+	Node<T>* new_node = new Node<T>(new_data);
+	if (!head){
+		head = new_node;
+		tail = new_node;
+	}
+	else
+		insert_sorted(head, new_node);
+}
+template<typename T>
+void LLL<T>::insert_sorted(Node<T>* list, Node<T>* new_node)
+{
+	//TODO testing
+	//should maybe overload Node::operator< but this works
+	if (new_node->get_data() < list->get_data()){ //insert before list
+		if (list == head){							//case new head
+			head = new_node;
+		}
+		else{										//case new sandwiched
+			list->get_prev()->set_next(new_node);
+		}
+		new_node->set_next(list);	//both new head and new sandwiched
+		list->set_prev(new_node);
+	}
+	else if (list == tail){ //insert after list;	  case new tail
+		tail = new_node;
+		list->set_next(new_node);
+		new_node->set_prev(list);
+	}
+	else{ //recurse
+		insert_sorted(list->get_next(), new_node);
+	}
 }
 
 template<typename T>

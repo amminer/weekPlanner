@@ -84,7 +84,7 @@ class Flight: public Event
 		Flight& operator+=(const Dinner&);
 		friend ostream& operator<<(ostream&, const Flight&); // display
 
-		virtual bool setup_from_cin(bool base_set=false, string checked_in="-1", string carryon_in="-1");
+		bool setup_from_cin(bool base_set=false, string checked_in="-1", string carryon_in="-1");
 	private:
 		int bags_checked;
 		int bags_carryon;
@@ -105,7 +105,7 @@ class Dinner: public Event
 		Dinner& operator+=(const Flight&);
 		friend ostream& operator<<(ostream&, const Dinner&); // display
 
-		virtual bool setup_from_cin(bool base_set=false, string guests_in="-1", string allergies_in="_");
+		bool setup_from_cin(bool base_set=false, string guests_in="-1", string allergies_in="_");
 	private:
 		int num_guests;
 		char* food_allergies;	//requirements list a derived char*
@@ -123,7 +123,7 @@ class Yoga: public Event
 
 		friend ostream& operator<<(ostream&, const Yoga&); // display
 
-		virtual bool setup_from_cin(bool base_set=false, string bpm_in="-1", string skill_in="-1");
+		bool setup_from_cin(bool base_set=false, string bpm_in="-1", string skill_in="-1");
 	private:
 		int resting_heart_rate;		//safety reasons
 		int skill_level;
