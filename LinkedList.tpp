@@ -148,8 +148,8 @@ size_t LLL<T>::length(void) const
 template<typename T>
 size_t LLL<T>::count_nodes(Node<T>* list) const
 {
-	if (list == tail)
-		return 1;
+	if (!list)
+		return 0;
 	else
 		return 1 + count_nodes(list->get_next());
 }

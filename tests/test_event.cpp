@@ -24,37 +24,32 @@ void compare_gele(const Event& a, const Event& b)
 	cout << '\n';
 }
 
-/* should note the format of desired input in docstring */
-// may be doing this wrong: see
-// https://stackoverflow.com/questions/35102079/c-upcasting-and-downcasting
+/* this behavior has been moved into class event
+ should note the format of desired input in docstring...
 void test_add_event()
 {
 	string type;
+	Event new_event;
 	cout << "(Options are flight, dinner, or yoga)\n"
 		 << "Choose an event type {!q to quit}: ";
 	getline(cin, type);
 	if (type == "!q")
 		return;
 	else if (type == "flight"){ //TODO exception handling/input validator function
-		Flight f = Flight();
-		if (f.setup_from_cin())
-			cout << "Your new event:\n" << f << '\n';
+		auto new_flight = dynamic_cast<Flight&>(new_event);
+		if (new_flight.setup_from_cin())
+			cout << "Your new event:\n" << new_event << '\n';
 	}
 	else if (type == "dinner"){
-		Dinner d = Dinner();
-		if (d.setup_from_cin())
-			cout << "Your new event:\n" << d << '\n';
 	}
 	else if (type == "yoga"){
-		Yoga y = Yoga();
-		if (y.setup_from_cin())
-			cout << "Your new event:\n" << y << '\n';
 	}
 	else{
 		cout <<"invalid input! Try again.\n";
 		test_add_event();
 	}
 }
+*/
 
 void test_comparative_ops(void) //still missing some edge cases...
 {
@@ -95,7 +90,7 @@ Event q = Event(monday, 12, 30, wednesday, 8, 20, "test", "test2");
 //moment event
 Event w = Event(tuesday, 10, 5, tuesday, 10, 5, "test3", "test4");
 
-test_add_event();
-//test_comparative_ops();
+//test_add_event(); VOID
+test_comparative_ops();
 
 }

@@ -34,8 +34,9 @@ class Node
 		void set_next(Node<T>* n);
 		void set_prev(Node<T>* n);
 		void set_data(const T& new_data);
-	private:
-		Node* prev;
+
+	protected:				//protected not private
+		Node* prev;			//so subclasses can use
 		Node* next;
 		T* data;
 };
@@ -58,8 +59,9 @@ class LLL
 		T* lookup(const T& key) const; //returns null if not found
 		bool remove(const T& to_remove); //returns whether successful
 		void display(bool indices=false) const; //displays all node contents
-	private:
-		Node<T>* head;
+
+	protected:					//protected not private
+		Node<T>* head;			//so subclasses can use
 		Node<T>* tail;
 
 		size_t count_nodes(Node<T>* list) const; //called by length(); counts nodes

@@ -77,6 +77,7 @@ class Flight: public Event
 {
 	public:
 		Flight(void);
+		Flight(const Flight& cpy);
 		~Flight(void);
 
 		//combines times, results in name "<flightname> + dinner for <dinnersz>"
@@ -98,6 +99,7 @@ class Dinner: public Event
 {
 	public:
 		Dinner(void);
+		Dinner(const Dinner& cpy);
 		~Dinner(void);
 
 		// combines times, results in name "<dinnername> + flight to <flightdest>"
@@ -119,6 +121,7 @@ class Yoga: public Event
 {
 	public:
 		Yoga(void);
+		Yoga(const Yoga& cpy);
 		~Yoga(void);
 
 		friend ostream& operator<<(ostream&, const Yoga&); // display

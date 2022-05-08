@@ -92,7 +92,8 @@ istream& operator>>(istream& in, Event& op2)
 }
 
 //Check for overlapping times (events w/ no gaps between do not count as overlapped)
-//DOES NOT check for strict containment - no need for this behavior for now
+//DOES NOT check for strict containment - no need for this behavior for now,
+//but can be achieved using combinations of existing operators, probably
 bool Event::operator==(const Event& op2) const
 {
 	return (stop > op2.start and stop <= op2.stop)
@@ -106,7 +107,8 @@ bool Event::operator!=(const Event& op2) const //see ==
 
 bool Event::operator< (const Event& op2) const //op1 before 
 {
-	return (stop < op2.start);
+	//return (stop < op2.start); //old method, must not overlap
+	return (start < op2.start);
 }
 
 bool Event::operator<=(const Event& op2) const //op1 before  with overlap (?)
@@ -118,7 +120,8 @@ bool Event::operator<=(const Event& op2) const //op1 before  with overlap (?)
 
 bool Event::operator> (const Event& op2) const //op1 after 
 {
-	return (start > op2.stop);
+	//return (start > op2.stop); //old method, must not overlap
+	return (start > op2.start);
 }
 
 bool Event::operator>=(const Event& op2) const //op1 after  with overlap (?)
@@ -267,6 +270,10 @@ void Event::set_stop(string& new_weekday, string& new_time)
 Flight::Flight(void)
 	: Event("flight"), bags_checked(-1), bags_carryon(-1) {}
 
+Flight::Flight(const Flight& cpy)
+	: Event(static_cast<const Event&>(cpy)),
+	  bags_checked(cpy.bags_checked), bags_carryon(cpy.bags_carryon) {}
+
 Flight::~Flight(void) {} //must overload virtual base destructor
 
 /*		OPERATORS		*/
@@ -332,6 +339,14 @@ void Flight::set_bags_carryon(int carryon_in){
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 Dinner::Dinner(void)
 	: Event("dinner"), num_guests(-1), food_allergies(to_dyn_charp("NOT SET")) {}
+
+Dinner::Dinner(const Dinner& cpy)
+	: Event(static_cast<const Event&>(cpy)),
+	  num_guests(cpy.num_guests), food_allergies(nullptr)
+{
+	food_allergies = new char[strlen(cpy.food_allergies) + 1];
+	strcpy(food_allergies, cpy.food_allergies);
+}
 
 Dinner::~Dinner(void)
 {
@@ -410,6 +425,11 @@ void Dinner::set_num_guests(int guests_in)
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 Yoga::Yoga(void)
 	: Event("yoga"), resting_heart_rate(-1), skill_level(-1) {}
+
+Yoga::Yoga(const Yoga& cpy)
+	: Event(static_cast<const Event&>(cpy)),
+	  resting_heart_rate(cpy.resting_heart_rate),
+	  skill_level(cpy.skill_level) {}
 
 Yoga::~Yoga(void) {} //must overload virtual base destructor
 
