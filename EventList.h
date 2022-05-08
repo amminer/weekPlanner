@@ -2,7 +2,7 @@
 
 #include "LinkedList.h"
 #include "Event.h"
-#include <algorithm>	//std::max, std::min
+#include <algorithm>	//std::min_element
 
 /* Amelia Miner
  * 05/06/22
@@ -31,8 +31,8 @@ class EventList
 		LLL<Yoga> yogas;
 
 		void display_chronological(size_t=0, size_t=0, size_t=0);
-		bool is_in_conflict(Event&); //check for conflicts before adding a new event
-		void insert_flight(Flight&);
-		void insert_dinner(Dinner&);
-		void insert_yoga(Yoga&);
+		bool is_in_conflict(Event*);   //wrapper; based on input subtype, calls...
+		bool is_in_conflict(Flight*);  //...this,
+		bool is_in_conflict(Dinner*);  //or this,
+		bool is_in_conflict(Yoga*);    //or this to allow some overlaps but not others.
 };

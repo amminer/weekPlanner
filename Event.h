@@ -52,7 +52,10 @@ class Event
 		friend istream& operator>>(istream&, Event&); // wrapper for setup
 
 		//called from top level UI code to prompt user
-		virtual bool setup_from_cin(string="_", string="_", string="_", string="_", string="_", string="_");
+		virtual bool setup_from_cin(string="_", string="_", string="_",
+									string="_", string="_", string="_");
+		//used for simple display in client code, a case where a getter is ok?
+		string get_name(void) const; //no internal string to reference, must return value
 
 	protected:
 		//used to translate string i/o; calls new; needed for init lists
@@ -63,7 +66,8 @@ class Event
 		WeekdayTime stop;
 		char* name;			//requirements list an inherited char*
 		string location;
-		string event_type;
+		string event_type; //this may not be necessary since dynamic_cast is a thing,
+						   //but it does simplify some things
 
 		//validation/setter functions called by setup func(s)
 		void set_name(const char*); //also used by copy constructor

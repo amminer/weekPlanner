@@ -138,13 +138,16 @@ bool Event::operator>=(const Event& op2) const //op1 after  with overlap (?)
 //	*Some arguments are never passed explicitly in this implementation,
 //but are still declared as arguments for ease of maintenance should new
 //functionality need to be implemented.
+//	this recursive-to-a-point-in-execution behavior makes the function very
+//long, but I think it is worthwhile - how could I break this up into helpers?
 bool Event::setup_from_cin(string new_name,		string new_loc,
 						   string startweekday,	string starttime,
 						   string stopweekday,	string stoptime)
 {
 	bool ret {true}; //maybe should've started with false...
-	string default_start = "00:00"; //used temporarily to check input
-	string default_stop  = "23:59";
+	//VOID no longer doing this to simplify client code; just check weekday and time at once
+	//string default_start = "00:00"; //used temporarily to check input
+	//string default_stop  = "23:59";
 	try{
 		if (new_name == "_"){
 			cout << "Enter a name {!q to quit}: ";
@@ -167,7 +170,7 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 			if (startweekday == "!q") ret = false;
 			else{
 				//slightly inefficient (extra instantiation of weekdaytime)...
-				//set_start(startweekday, default_start); //validates weekday before asking for time
+				//set_start(startweekday, default_start); //validates weekday before time
 				cout << "Time {24h, h:m, !q to quit}: ";
 				getline(cin, starttime);
 			}
@@ -183,7 +186,7 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 			if (stopweekday == "!q") ret = false;
 			else{
 				//slightly inefficient (extra instantiation of weekdaytime)...
-				//set_stop(stopweekday, default_stop); //validates weekday before asking for time
+				//set_stop(stopweekday, default_stop); //validates weekday before time
 				cout << "Time {24h, h:m, !q to quit}: ";
 				getline(cin, stoptime);
 			}
@@ -222,6 +225,11 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 		return setup_from_cin(name, location);
 	}
 	return ret; //compiler doesn't like when I put this in the try block, makes sense I guess
+}
+
+string Event::get_name(void) const
+{
+	return string(name); //no internal string to reference, must return value
 }
 
 /*		PRIVATE FUNCTIONS		*/
@@ -270,7 +278,7 @@ void Event::set_stop(string& new_weekday, string& new_time)
 Flight::Flight(void)
 	: Event("flight"), bags_checked(-1), bags_carryon(-1) {}
 
-Flight::Flight(const Flight& cpy)
+Flight::Flight(const Flight& cpy) //may not be necessary, event cpy constr sufficient?
 	: Event(static_cast<const Event&>(cpy)),
 	  bags_checked(cpy.bags_checked), bags_carryon(cpy.bags_carryon) {}
 
@@ -426,7 +434,7 @@ void Dinner::set_num_guests(int guests_in)
 Yoga::Yoga(void)
 	: Event("yoga"), resting_heart_rate(-1), skill_level(-1) {}
 
-Yoga::Yoga(const Yoga& cpy)
+Yoga::Yoga(const Yoga& cpy) //may not be necessary, base copy constr is sufficient?
 	: Event(static_cast<const Event&>(cpy)),
 	  resting_heart_rate(cpy.resting_heart_rate),
 	  skill_level(cpy.skill_level) {}
