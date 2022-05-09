@@ -7,10 +7,10 @@ using namespace std;
 /* Amelia Miner
  * 04/29/22
  * cs 202 section 003
- * PROGRAM #:		2
- * FILE:			LinkedList.h
- * PURPOSE: 		Node and linear doubly linked list
- *					class templates
+ * PROGRAM #:	2
+ * FILE:		LinkedList.h
+ * PURPOSE: 	Node and linear doubly linked list
+ *				class templates.
  */
 
 template<typename T>
@@ -35,8 +35,8 @@ class Node
 		void set_prev(Node<T>* n);
 		void set_data(const T& new_data);
 
-	protected:				//protected not private
-		Node* prev;			//so subclasses can use
+	private:
+		Node* prev;
 		Node* next;
 		T* data;
 };
@@ -60,8 +60,8 @@ class LLL
 		bool remove(const T& to_remove); //returns whether successful
 		void display(bool indices=false) const; //displays all node contents
 
-	protected:					//protected not private
-		Node<T>* head;			//so subclasses can use
+	private:
+		Node<T>* head;
 		Node<T>* tail;
 
 		size_t count_nodes(Node<T>* list) const; //called by length(); counts nodes

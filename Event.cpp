@@ -93,15 +93,6 @@ istream& operator>>(istream& in, Event& op2)
 	return in;
 }
 
-//Check for overlapping times (events w/ no gaps between do not count as overlapped)
-//DOES NOT imply containment-in-time - no need for this behavior for now,
-//but can be achieved using combinations of existing operators, probably
-bool Event::overlaps(const Event& other) const
-{
-	return (stop > other.start and stop <= other.stop)
-		or (stop > other.start and start < other.stop);
-}
-
 bool Event::operator==(const Event& op2) const
 {
 	return strcmp(name, op2.name) == 0;
@@ -139,6 +130,16 @@ bool Event::operator>=(const Event& op2) const //op1 after  with overlap (?)
 }
 
 /*		PUBLIC FUNCTIONS		*/
+
+//Check for overlapping times (events w/ no gaps between do not count as overlapped)
+//DOES NOT imply containment-in-time - no need for this behavior for now,
+//but can be achieved using combinations of existing operators, probably
+bool Event::overlaps(const Event& other) const
+{
+	return (stop > other.start and stop <= other.stop)
+		or (stop > other.start and start < other.stop);
+}
+
 //	Used by client code to initialize the values of an event from cin.
 //	All function-scope variables used to catch input are passed in as args
 //with a default value of "_" to detect whether there was previous input.
@@ -231,7 +232,7 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 		cout << "Please try again.\n";
 		return setup_from_cin(name, location);
 	}
-	return ret; //compiler doesn't like when I put this in the try block, makes sense I guess
+	return ret;
 }
 
 string Event::get_name(void) const
@@ -241,6 +242,7 @@ string Event::get_name(void) const
 
 /*		PRIVATE FUNCTIONS		*/
 //(currently these are just for use in setup)
+
 //Wrapper to set_name(char*)
 void Event::set_name(const string& in_name)
 {
@@ -298,7 +300,6 @@ Flight::Flight(const Flight& cpy) //may not be necessary, event cpy constr suffi
 Flight::~Flight(void) {} //must overload virtual base destructor
 
 /*		OPERATORS		*/
-//+, += ?
 ostream& operator<<(ostream& out, const Flight& op2)
 {
 	out << static_cast<const Event&>(op2) << '\n';
@@ -381,7 +382,6 @@ Dinner::~Dinner(void)
 		delete [] food_allergies;
 }
 /*		OPERATORS		*/
-//+, += ?
 ostream& operator<<(ostream& out, const Dinner& op2)
 {
 	out << static_cast<const Event&>(op2) << '\n';

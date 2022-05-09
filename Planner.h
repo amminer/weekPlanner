@@ -12,13 +12,13 @@
 /* Amelia Miner
  * 05/08/2022
  * cs 202 section 003
- * PROGRAM #:		2
- * FILE:			Planner.h
- * PURPOSE: 		Uses std::list to maintain a collection 
- *					of EventLists representing consecutive weeks.
- *					Handles basic user I/O,
- *					scheduling conflicts are handled on a weekly
- *					basis inside class EventList.
+ * PROGRAM #:	2
+ * FILE:		Planner.h
+ * PURPOSE: 	Uses std::list to maintain a collection 
+ *				of EventLists representing consecutive weeks.
+ *				Handles basic user I/O,
+ *				scheduling conflicts are handled on a weekly
+ *				basis inside class EventList.
  */
 
 class Planner
@@ -27,7 +27,6 @@ class Planner
 		Planner(void); //called by main loop
 		//default destructor and cpy constr are ok, no dyn mem
 
-		void help(void); 		 //loosely explains the concept of the program
 		size_t size(void);		 //returns number of weeks in planner
 		void add_week(void);	 //add a page to the planner
 		void print_week(size_t); //print week specified by number

@@ -35,7 +35,7 @@ void test_add_event()
 	getline(cin, type);
 	if (type == "!q")
 		return;
-	else if (type == "flight"){ //TODO exception handling/input validator function
+	else if (type == "flight"){
 		auto new_flight = dynamic_cast<Flight&>(new_event);
 		if (new_flight.setup_from_cin())
 			cout << "Your new event:\n" << new_event << '\n';

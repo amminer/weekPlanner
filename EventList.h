@@ -2,7 +2,7 @@
 
 #include "LinkedList.h"
 #include "Event.h"
-#include <algorithm>	//std::min_element
+#include <algorithm>	//std::min_element, std::distance
 
 /* Amelia Miner
  * 05/06/22
@@ -33,11 +33,10 @@ class EventList
 		LLL<Dinner> dinners;
 		LLL<Yoga> yogas;
 
+		void display_chronological(size_t=0, size_t=0, size_t=0) const;
 		bool remove_flight(string&);
 		bool remove_dinner(string&);
 		bool remove_yoga(string&);
-		void remove_event(Event& name_to_match); //must pass an object since DLL is templated
-		void display_chronological(size_t=0, size_t=0, size_t=0) const;
 		bool creates_name_conflict(const string& new_name) const; //wrapper, calls each of the following:
 		bool creates_name_conflict(const string& new_name, const LLL<Flight>& check_list) const; //returning true if any
 		bool creates_name_conflict(const string& new_name, const LLL<Dinner>& check_list) const; //of these helpers
@@ -46,4 +45,6 @@ class EventList
 		bool creates_time_conflict(Flight*) const;  //...this,
 		bool creates_time_conflict(Dinner*) const;  //or this,
 		bool creates_time_conflict(Yoga*) const;    //or this to allow some overlaps but not others.
+		//these bools could be void and throw exceptions, but I already wrote exception handling into events
+		//so I can just do it this way right? Hope this is ok!
 };

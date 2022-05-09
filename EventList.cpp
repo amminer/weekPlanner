@@ -100,7 +100,7 @@ void EventList::add_event(void)
 				new_name = f.get_name();
 				if (!creates_time_conflict(&f) and !creates_name_conflict(new_name))
 					flights.insert_sorted(f);
-				else //TODO exception handling should be used here to communicate about conflicting event
+				else
 					cout << "Error adding " << new_name
 						 << "; there is a conflict with an existing event.\n"; 
 			}
@@ -111,7 +111,7 @@ void EventList::add_event(void)
 				new_name = d.get_name();
 				if (!creates_time_conflict(&d) and !creates_name_conflict(new_name))
 					dinners.insert_sorted(d);
-				else //TODO exception handling should be used here to communicate about conflicting event
+				else
 					cout << "Error adding " << new_name
 						 << "; there is a conflict with an existing event.\n"; 
 			}
@@ -122,7 +122,7 @@ void EventList::add_event(void)
 				new_name = y.get_name();
 				if (!creates_time_conflict(&y) and !creates_name_conflict(new_name))
 					yogas.insert_sorted(y);
-				else //TODO exception handling should be used here to communicate about conflicting event
+				else
 					cout << "Error adding " << new_name
 						 << "; there is a conflict with an existing event.\n"; 
 			}

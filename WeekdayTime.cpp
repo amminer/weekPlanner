@@ -38,6 +38,7 @@ string to_lower(const string& in_string)
 	return out_ss.str();
 }
 
+//returns the string representation of a weekday enum-int-thing
 string weekday_to_string(const Weekday day)
 {
 	switch (day){
@@ -60,29 +61,31 @@ string weekday_to_string(const Weekday day)
 	}
 }
 
-//TODO allow abbreviations
+//returns a member of weekday enum based on string input
 Weekday string_to_weekday(const string& day)
 {
-	string cleaned_day = to_lower(day);
-	if 		(cleaned_day == "sunday")
+	string lday = to_lower(day);
+	if 		(lday == "sunday" or lday == "sun")
 		return sunday;
-	else if (cleaned_day == "monday")
+	else if (lday == "monday" or lday == "mon")
 		return monday;
-	else if (cleaned_day == "tuesday")
+	else if (lday == "tuesday" or lday == "tue")
 		return tuesday;
-	else if (cleaned_day == "wednesday")
+	else if (lday == "wednesday" or lday == "wed")
 		return wednesday;
-	else if (cleaned_day == "thursday")
+	else if (lday == "thursday" or lday == "thu")
 		return thursday;
-	else if (cleaned_day == "friday")
+	else if (lday == "friday" or lday == "fri")
 		return friday;
-	else if (cleaned_day == "saturday")
+	else if (lday == "saturday" or lday == "sat")
 		return saturday;
 	else
 		throw string_is_not_weekday(day);
 }
 
-//TODO allow 12-hour format
+//returns the number of minutes from midnight to the time passed in
+//with the argument formatted "h:m", "hh:m", "h:mm", or "hh:mm"
+//lest an exception be thrown
 uint string_to_min(string timestring)
 {
 	regex pattern {"([0]?[0-9]|[1][0-9]|[2][0-3]):([0-5]?[0-9])"};
@@ -93,6 +96,7 @@ uint string_to_min(string timestring)
 		throw string_is_not_time(timestring);
 }
 
+//converts hour & minute input into minutes-from-midnight output
 uint hhmm_to_m(int hr, int min)
 {
 	if (hr <= 0)
@@ -101,11 +105,12 @@ uint hhmm_to_m(int hr, int min)
 		return (uint) 60 + hhmm_to_m(hr-1, min);
 }
 
+//converts minutes-from-midnight input into hour & minute output
 string m_to_hhmm(uint out_min, int out_hr)
 {
-	if (out_min < 0)
-		return "ERROR";
-	else if (out_min <= 9)
+	if (out_min < 0)		//leaving error case in just in case - 
+		return "ERROR";		//if you can get my program to do this from the UI
+	else if (out_min <= 9)  //show me how and I'll buy you a coffee
 		return to_string(out_hr) + ":0" + to_string(out_min);
 	else if (out_min < 60)
 		return to_string(out_hr) + ':' + to_string(out_min);

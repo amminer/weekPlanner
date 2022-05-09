@@ -3,47 +3,38 @@
 /* Amelia Miner
  * 05/08/2022
  * cs 202 section 003
- * PROGRAM #:		2
- * FILE:			Planner.h
- * PURPOSE: 		Uses std::list to maintain a collection 
- *					of EventLists representing consecutive weeks.
- *					Also includes main function, which uses a while loop
- *					to display the current week and the main menu.
- *					Think of this as being the page currently being viewed.
- *					The user can add new pages, add new events to the
- *					current page, flip the page forward or backward,
- *					go to any page by its number, or remove events from
- *					the current page.
- *					Removing and copying weeks/pages would be easy to
- *					implement using this design, but I chose to keep it
- *					simple.
- *					The planner must have at least one week, if you wish
- *					to use or extend this class you should keep this in mind,
- *					but it would not be difficult to remove this limitation.
- *					I did not do so since you want at least one week if you
- *					are running the program - would be annoying to have to
- *					add the first week each time you run this.
+ * PROGRAM #:	2
+ * FILE:		Planner.h
+ * PURPOSE: 	Uses std::list to maintain a collection 
+ *				of EventLists representing consecutive weeks.
+ *				Also includes main function, which uses a while loop
+ *				to display the current week and the main menu.
+ *				Think of this as being the page currently being viewed.
+ *				The user can add new pages, add new events to the
+ *				current page, flip the page forward or backward,
+ *				go to any page by its number, or remove events from
+ *				the current page.
+ *				Removing and copying weeks/pages would be easy to
+ *				implement using this design, but I chose to keep it
+ *				simple.
+ *				The planner must have at least one week, if you wish
+ *				to use or extend this class you should keep this in mind,
+ *				but it would not be difficult to remove this limitation.
+ *				I did not do so since you want at least one week if you
+ *				are running the program - would be annoying to have to
+ *				add the first week each time you run this.
  */
+
+/*	CONSTRUCTORS	*/
 
 Planner::Planner(void) //called by main loop, sets up first week
 	: weeks({EventList(1)}) {}
 
+/*	PUBLIC FUNCTIONS	*/
+
 size_t Planner::size(void)
 {
 	return weeks.size();
-}
-
-//public access to week at index week_num-1 for main loop
-//TODO may not be needed anymore
-EventList* Planner::week(size_t week_num)
-{
-	if (week_num > weeks.size())
-		return nullptr;
-	else{
-		auto it {weeks.begin()};
-		advance(it, week_num-1); //0 indexed
-		return &*it; //iterator points to elmt
-	}
 }
 
 void Planner::print_week(size_t week_num)
@@ -71,24 +62,21 @@ void Planner::remove_event(size_t week_num)
 	}
 }
 
+/*	PRIVATER FUNCTIONS	*/
 
-
-void Planner::help(void)
+//access the week/EventList at index week_num-1
+EventList* Planner::week(size_t week_num)
 {
-	cout << "The planner has a page for each week. To keep it simple, at startup\n"
-		 << "only one page has been set up - you have a blank canvas and only\n"
-		 << "need to keep track of an upcoming week once you know you have a/\n"
-		 << "reservation for some day/time in that week.\n"
-		 << "Do not try to use this application like a calendar!\n"
-		 << "That being noted, 3 kinds of reservations can be added to the planner,\n"
-		 << "a flight, a dinner, or a yoga class. Reservations must not overlap\n"
-		 << "each other's times, except that a flight may overlap with exactly one\n"
-		 << "dinner and vice versa. Reservations may not begin in one week and end\n"
-		 << "in another - weeks start Sunday at midnight, 0:00, and end Saturday at 23:59.\n"
-		 << "This is loosely based on the way that I use my planner in real life,\n"
-		 << "As my planner is just a blank notebook that I organize into one week per page.\n"
-		 << "I just thought it would be more fun than doing a calendar. This is an exercise in\n";
+	if (week_num > weeks.size())
+		return nullptr;
+	else{
+		auto it {weeks.begin()};
+		advance(it, week_num-1); //0 indexed
+		return &*it; //iterator points to elmt
+	}
 }
+
+/*	MAIN LOOP	*/
 
 int main(void)
 {

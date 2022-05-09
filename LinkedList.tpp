@@ -3,12 +3,12 @@
 #include "LinkedList.h"
 
 /* Amelia Miner
- * 04/09/22
+ * 04/29/22
  * cs 202 section 003
- * program #: 1
- * file: LinkedList.cpp
- * PURPOSE: Node, linear linked list,
- *	and circular linked list class templates.
+ * PROGRAM #:	2
+ * FILE:		LinkedList.tpp
+ * PURPOSE: 	Node and linear doubly linked list
+ *				class templates.
  */
 
 /*								NODE								*/
@@ -208,7 +208,6 @@ void LLL<T>::insert_sorted(const T& new_data)
 template<typename T>
 void LLL<T>::insert_sorted(Node<T>* list, Node<T>* new_node)
 {
-	//TODO testing
 	//should maybe overload Node::operator< but this works
 	if (new_node->get_data() < list->get_data()){ //insert before list
 		if (list == head){							//case new head

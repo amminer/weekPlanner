@@ -3,7 +3,7 @@
 #include "WeekdayTime.h"
 #include <cstring>
 #include <iostream>
-#include <sstream>
+#include <sstream> //allows use of operator<< to throw exception w/ message
 
 using namespace std;
 
@@ -25,11 +25,12 @@ using namespace std;
 class Event
 {
 	public:
+		Event(void);
 		//this is the only constructor that will be called from the finished code
-		Event(const string);			//used to initialize an event for storage in practice
-		Event(const string&, const string&);	//for creating a key to lookup from a template linkedlist
-		Event(void);			//for testing class functionality w/o all user input
-		Event(Weekday, int, int, Weekday, int, int, string, string); //for testing ^
+		//used to initialize an event for storage in practice
+		Event(const string); //arg is not ref so it can handle string literals
+		Event(const string&, const string&);	//for creating a key to lookup in template DLL
+		Event(Weekday, int, int, Weekday, int, int, string, string); //for testing
 		Event(const Event&);
 		virtual ~Event();
 
