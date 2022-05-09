@@ -56,7 +56,7 @@ enum Weekday{sunday, monday, tuesday, wednesday, thursday, friday, saturday};
 
 //weekday-related functions in global namespace
 string weekday_to_string(const Weekday);
-Weekday string_to_weekday(const string);
+Weekday string_to_weekday(const string&);
 //TODO these ones can probably be private
 uint hhmm_to_m(int, int);
 string m_to_hhmm(uint, int=0);

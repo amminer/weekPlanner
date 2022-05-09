@@ -1,6 +1,6 @@
 #include "../EventList.h"
 
-EventList myweek(1);
+EventList myweek(1); //manipulate this from subroutines
 
 void manual(void)
 {
@@ -14,15 +14,20 @@ void manual(void)
 	}
 }
 
+void remove(void)
+{
+	try{
+		myweek.remove_event();
+	}
+	catch (string& exc){
+		cout << exc << " could not be deleted - is it in the list?\n";
+	}
+}
+
 int main(void)
 {
-
 manual();
-//can't do this, no param constrs for event subclasses, too lazy to undo manual function
-//add them if you must, but my code just works so I don't need to B)
-//(kidding, I understand that this is not best practice)
-//automatic();
+remove();
 
 cout << myweek << '\n'; //spits out weeknum and calls display_chronological()
-
 }

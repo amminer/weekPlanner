@@ -29,6 +29,14 @@ string_is_not_time::string_is_not_time(const string& new_message)
 	: runtime_error(new_message) {}
 
 /*		PUBLIC, GLOBAL FUNCTIONS		*/
+string to_lower(const string& in_string)
+{
+	stringstream out_ss;
+	for (size_t i=0; i < in_string.length(); ++i){
+		out_ss << (char) tolower(in_string[i]);
+	}
+	return out_ss.str();
+}
 
 string weekday_to_string(const Weekday day)
 {
@@ -53,13 +61,9 @@ string weekday_to_string(const Weekday day)
 }
 
 //TODO allow abbreviations
-Weekday string_to_weekday(const string day)
+Weekday string_to_weekday(const string& day)
 {
-	stringstream lowercase_day;
-	for (size_t i=0; i < day.length(); ++i){
-		lowercase_day << (char) tolower(day[i]);
-	}
-	string cleaned_day = lowercase_day.str();
+	string cleaned_day = to_lower(day);
 	if 		(cleaned_day == "sunday")
 		return sunday;
 	else if (cleaned_day == "monday")

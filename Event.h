@@ -32,16 +32,16 @@ class Event
 {
 	public:
 		//this is the only constructor that will be called from the finished code
-		Event(string);			//delete other constrs? Would still be good for testing?
+		Event(const string);			//used to initialize an event for storage in practice
+		Event(const string&, const string&);	//for creating a key to lookup from a template linkedlist
 		Event(void);			//for testing class functionality w/o all user input
-		Event(string, string);	//for testing class functionality w/o all user input
-		Event(Weekday, int, int, Weekday, int, int, string, string); //see above
+		Event(Weekday, int, int, Weekday, int, int, string, string); //for testing ^
 		Event(const Event&);
 		virtual ~Event();
 
 		Event& operator=(const Event&); //called by copy constr
 
-		bool operator==(const Event&) const; //check for overlapping times
+		bool operator==(const Event&) const; //returns whether names match
 		bool operator!=(const Event&) const; //see ==
 		bool operator< (const Event&) const; //op1 before 
 		bool operator<=(const Event&) const; //op1 before  with overlap (?)
@@ -56,10 +56,8 @@ class Event
 									string="_", string="_", string="_");
 		//used for simple display in client code, a case where a getter is ok?
 		string get_name(void) const; //no internal string to reference, must return value
-
-	protected:
-		//used to translate string i/o; calls new; needed for init lists
-		char* to_dyn_charp(const string) const; //no ref arg, accepts literals
+		//used to check for overlap with another event (end-to-end is not overlap!)
+		bool overlaps(const Event& other) const;
 
 	private:
 		WeekdayTime start;
@@ -71,7 +69,7 @@ class Event
 
 		//validation/setter functions called by setup func(s)
 		void set_name(const char*); //also used by copy constructor
-		void set_name(string&); //wrapper for set_name(const char*)
+		void set_name(const string&); //wrapper for set_name(const char*)
 		void set_start(string&, string&);
 		void set_stop(string&, string&);
 };
@@ -81,6 +79,7 @@ class Flight: public Event
 {
 	public:
 		Flight(void);
+		Flight(const string&); //used to make a key for lookup in template LLL
 		Flight(const Flight& cpy);
 		~Flight(void);
 
@@ -103,6 +102,7 @@ class Dinner: public Event
 {
 	public:
 		Dinner(void);
+		Dinner(const string&); //used to make a key for lookup in template LLL
 		Dinner(const Dinner& cpy);
 		~Dinner(void);
 
@@ -125,6 +125,7 @@ class Yoga: public Event
 {
 	public:
 		Yoga(void);
+		Yoga(const string&); //used to make a key for lookup in template LLL
 		Yoga(const Yoga& cpy);
 		~Yoga(void);
 

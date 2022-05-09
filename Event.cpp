@@ -25,10 +25,19 @@ Event::Event(void)
 //Initializes the new event for setup.
 //Important that start and stop are at their lower and upper limits respectively!
 //(This is the constructor that is called from derived constructors)
-Event::Event(string type)
+Event::Event(const string type)
 	: start(WeekdayTime(sunday, 0, 0)),
 	  stop(WeekdayTime(saturday, 24, 59)),
-	  name(to_dyn_charp("NOT SET")), location("NOT SET"), event_type(type) {}
+	  name(nullptr), location("NOT SET"), event_type(type) {}
+
+//Used to create a key to pass as a reference to linkedlist lookup function
+//since list checks for matching names using Event::operator==(Event&) and
+//knows nothing about event internals (templated)
+Event::Event(const string& new_name, const string& new_type)
+	: name(nullptr), event_type(new_type)
+{
+	set_name(new_name);
+}
 
 //for testing class Event&derived, not for use in client code
 Event::Event(Weekday in_start_day, int in_start_hour, int in_start_min,
@@ -36,12 +45,9 @@ Event::Event(Weekday in_start_day, int in_start_hour, int in_start_min,
 			 string in_name, string in_loc)
 	: start(WeekdayTime(in_start_day, in_start_hour, in_start_min)),
 	  stop( WeekdayTime(in_stop_day,  in_stop_hour,  in_stop_min )),
-	  name(to_dyn_charp(in_name)), location(in_loc), event_type("event") {}
-char* Event::to_dyn_charp(const string in_str) const
+	  name(nullptr), location(in_loc), event_type("event")
 {
-	char* new_cstring = new char[in_str.length() + 1];
-	strcpy(new_cstring, in_str.c_str());
-	return new_cstring;
+	set_name(in_name);
 }
 
 Event::Event(const Event& cpy)
@@ -92,12 +98,17 @@ istream& operator>>(istream& in, Event& op2)
 }
 
 //Check for overlapping times (events w/ no gaps between do not count as overlapped)
-//DOES NOT check for strict containment - no need for this behavior for now,
+//DOES NOT imply containment-in-time - no need for this behavior for now,
 //but can be achieved using combinations of existing operators, probably
+bool Event::overlaps(const Event& other) const
+{
+	return (stop > other.start and stop <= other.stop)
+		or (stop > other.start and start < other.stop);
+}
+
 bool Event::operator==(const Event& op2) const
 {
-	return (stop > op2.start and stop <= op2.stop)
-		or (stop > op2.start and start < op2.stop);
+	return strcmp(name, op2.name) == 0;
 }
 
 bool Event::operator!=(const Event& op2) const //see ==
@@ -150,13 +161,13 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 	//string default_stop  = "23:59";
 	try{
 		if (new_name == "_"){
-			cout << "Enter a name {!q to quit}: ";
+			cout << "Enter a name {!q to cancel}: ";
 			getline(cin, new_name); //not validated
 			if (new_name == "!q") ret = false;
 			else set_name(new_name); //no validation needed but must convert str to cstr
 		}
 		if (new_loc == "_" and ret){
-			cout << "Enter a location {!q to quit}: ";
+			cout << "Enter a location {!q to cancel}: ";
 			getline(cin, new_loc); //not validated
 			if (new_loc == "!q") ret = false;
 			else location = new_loc; //data type matches and no validation needed
@@ -165,13 +176,13 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 			cout << "When does \"" << name << "\" start?\n";
 		}
 		if (startweekday == "_" and ret){
-			cout << "Day of week {!q to quit}: ";
+			cout << "Day of week {!q to cancel}: ";
 			getline(cin, startweekday);
 			if (startweekday == "!q") ret = false;
 			else{
 				//slightly inefficient (extra instantiation of weekdaytime)...
 				//set_start(startweekday, default_start); //validates weekday before time
-				cout << "Time {24h, h:m, !q to quit}: ";
+				cout << "Time {24h, h:m, !q to cancel}: ";
 				getline(cin, starttime);
 			}
 			if (starttime == "!q" or !ret) ret = false;
@@ -181,13 +192,13 @@ bool Event::setup_from_cin(string new_name,		string new_loc,
 			cout << "When does \"" << name << "\" stop?\n";
 		}
 		if (stopweekday == "_" and ret){
-			cout << "Day of week {!q to quit}: ";
+			cout << "Day of week {!q to cancel}: ";
 			getline(cin, stopweekday);
 			if (stopweekday == "!q") ret = false;
 			else{
 				//slightly inefficient (extra instantiation of weekdaytime)...
 				//set_stop(stopweekday, default_stop); //validates weekday before time
-				cout << "Time {24h, h:m, !q to quit}: ";
+				cout << "Time {24h, h:m, !q to cancel}: ";
 				getline(cin, stoptime);
 			}
 			if (stoptime == "!q" or !ret) ret = false;
@@ -235,7 +246,7 @@ string Event::get_name(void) const
 /*		PRIVATE FUNCTIONS		*/
 //(currently these are just for use in setup)
 //Wrapper to set_name(char*)
-void Event::set_name(string& in_name)
+void Event::set_name(const string& in_name)
 {
 	set_name(in_name.c_str());
 }
@@ -278,6 +289,12 @@ void Event::set_stop(string& new_weekday, string& new_time)
 Flight::Flight(void)
 	: Event("flight"), bags_checked(-1), bags_carryon(-1) {}
 
+//Used to create a key to pass as a reference to linkedlist lookup function
+//since list checks for matching names using Event::operator==(Event&) and
+//knows nothing about event internals (templated)
+Flight::Flight(const string& new_name)
+	: Event(new_name, "flight_key") {}
+
 Flight::Flight(const Flight& cpy) //may not be necessary, event cpy constr sufficient?
 	: Event(static_cast<const Event&>(cpy)),
 	  bags_checked(cpy.bags_checked), bags_carryon(cpy.bags_carryon) {}
@@ -304,13 +321,13 @@ bool Flight::setup_from_cin(bool base_set, string checked_in, string carryon_in)
 	if (ret){ //guards against user quitting from event::setup
 		try{
 			if (checked_in == "-1"){
-				cout << "Checked bags {!q to quit}: ";
+				cout << "Checked bags {!q to cancel}: ";
 				getline(cin, checked_in);
 				if (checked_in == "!q") ret = false;
 				else set_bags_checked(stoi(checked_in));
 			}
 			if (carryon_in == "-1" and ret){
-				cout << "Carry-on bags {!q to quit}: ";
+				cout << "Carry-on bags {!q to cancel}: ";
 				getline(cin, carryon_in);
 				if (carryon_in == "!q") ret = false;
 				else set_bags_carryon(stoi(carryon_in));
@@ -346,7 +363,13 @@ void Flight::set_bags_carryon(int carryon_in){
 /*	CLASS DINNER	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 Dinner::Dinner(void)
-	: Event("dinner"), num_guests(-1), food_allergies(to_dyn_charp("NOT SET")) {}
+	: Event("dinner"), num_guests(-1), food_allergies(nullptr) {}
+
+//Used to create a key to pass as a reference to linkedlist lookup function
+//since list checks for matching names using Event::operator==(Event&) and
+//knows nothing about event internals (templated)
+Dinner::Dinner(const string& new_name)
+	: Event(new_name, "dinner_key"), food_allergies(nullptr) {}
 
 Dinner::Dinner(const Dinner& cpy)
 	: Event(static_cast<const Event&>(cpy)),
@@ -381,13 +404,13 @@ bool Dinner::setup_from_cin(bool base_set, string guests_in, string allergies_in
 	if (ret){ //guards against user quitting from event::setup
 		try{
 			if (guests_in == "-1"){
-				cout << "Number of guests {!q to quit}: ";
+				cout << "Number of guests {!q to cancel}: ";
 				getline(cin, guests_in);
 				if (guests_in == "!q") ret = false;
 				else set_num_guests(stoi(guests_in));
 			}
 			if (allergies_in == "_" and ret){
-				cout << "Enter food allergies for your table(s)\n{!q to quit, enter if none}: ";
+				cout << "Enter food allergies for your table(s)\n{!q to cancel, enter if none}: ";
 				getline(cin, allergies_in);
 				if (allergies_in == "!q") ret = false;
 				else set_allergies(allergies_in);
@@ -434,6 +457,12 @@ void Dinner::set_num_guests(int guests_in)
 Yoga::Yoga(void)
 	: Event("yoga"), resting_heart_rate(-1), skill_level(-1) {}
 
+//Used to create a key to pass as a reference to linkedlist lookup function
+//since list checks for matching names using Event::operator==(Event&) and
+//knows nothing about event internals (templated)
+Yoga::Yoga(const string& new_name)
+	: Event(new_name, "yoga_key") {}
+
 Yoga::Yoga(const Yoga& cpy) //may not be necessary, base copy constr is sufficient?
 	: Event(static_cast<const Event&>(cpy)),
 	  resting_heart_rate(cpy.resting_heart_rate),
@@ -460,13 +489,13 @@ bool Yoga::setup_from_cin(bool base_set, string bpm_in, string skill_in)
 	if (ret){ //guards against user quitting from event::setup
 		try{
 			if (bpm_in == "-1"){
-				cout << "Your resting heart rate {!q to quit}: ";
+				cout << "Your resting heart rate {!q to cancel}: ";
 				getline(cin, bpm_in);
 				if (bpm_in == "!q") ret = false;
 				else set_resting_heart_rate(stoi(bpm_in));
 			}
 			if (skill_in == "-1" and ret){
-				cout << "Your skill level from 1 to 10 {!q to quit}: ";
+				cout << "Your skill level from 1 to 10 {!q to cancel}: ";
 				getline(cin, skill_in);
 				if (skill_in == "!q") ret = false;
 				else set_skill_level(stoi(skill_in));

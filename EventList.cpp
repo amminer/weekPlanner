@@ -7,7 +7,7 @@
  * FILE:		EventList.cpp
  * PURPOSE:		Class EventList uses a doubly linked list (class LLL) to store a
  *				collection of Event objects.
- *				It uses Event::operator== and the event's type to prevent scheduling
+ *				It uses Event::overlaps(Event&) and the event's type to prevent scheduling
  *				conflicts - flights and dinners may be scheduled simultaneously, but
  *				otherwise no two events may overlap, and no more than one of each
  *				event type may overlap with another whose type matches its own;
@@ -41,7 +41,7 @@ ostream& operator<<(ostream& out, EventList& op2)
 //and only incrementing them if they are used to print an event. Once an index is greater than
 //or equal to the len of the list it is indexing, we stop considering it in our event comparisons.
 //all arguments default to 0, so if we just call the function with no args we display everything.
-void EventList::display_chronological(size_t flights_index, size_t dinners_index, size_t yogas_index)
+void EventList::display_chronological(size_t flights_index, size_t dinners_index, size_t yogas_index) const
 {
 	vector<Event*> to_comp; //empty vector will store 0, 1, 2, or 3 events to compare
 	if (flights_index < flights.length())
@@ -85,8 +85,9 @@ void EventList::display_chronological(size_t flights_index, size_t dinners_index
 void EventList::add_event(void)
 {
 	string type;
-	cout << "(Options are flight, dinner, or yoga)\n"
-		 << "Choose an event type {!q to cancel this new event}: ";
+	string new_name; //used to check for name conflicts after event creation
+	cout << "\n(Options are flight, dinner, or yoga)\n"
+		 << "Choose an event type {!q to cancel}: ";
 	getline(cin, type);
 	try{
 		if (type == "!q")
@@ -94,30 +95,33 @@ void EventList::add_event(void)
 		else if (type == "flight"){
 			Flight f = Flight();
 			if (f.setup_from_cin()){
-				if (!is_in_conflict(&f))
+				new_name = f.get_name();
+				if (!creates_time_conflict(&f) and !creates_name_conflict(new_name))
 					flights.insert_sorted(f);
 				else //TODO exception handling should be used here to communicate about conflicting event
-					cout << "Error adding " << f.get_name()
+					cout << "Error adding " << new_name
 						 << "; there is a conflict with an existing event.\n"; 
 			}
 		}
 		else if (type == "dinner"){
 			Dinner d = Dinner();
 			if (d.setup_from_cin()){
-				if (!is_in_conflict(&d))
+				new_name = d.get_name();
+				if (!creates_time_conflict(&d) and !creates_name_conflict(new_name))
 					dinners.insert_sorted(d);
 				else //TODO exception handling should be used here to communicate about conflicting event
-					cout << "Error adding " << d.get_name()
+					cout << "Error adding " << new_name
 						 << "; there is a conflict with an existing event.\n"; 
 			}
 		}
 		else if (type == "yoga"){
 			Yoga y = Yoga();
 			if (y.setup_from_cin()){
-				if (!is_in_conflict(&y))
+				new_name = y.get_name();
+				if (!creates_time_conflict(&y) and !creates_name_conflict(new_name))
 					yogas.insert_sorted(y);
 				else //TODO exception handling should be used here to communicate about conflicting event
-					cout << "Error adding " << y.get_name()
+					cout << "Error adding " << new_name
 						 << "; there is a conflict with an existing event.\n"; 
 			}
 		}
@@ -132,79 +136,137 @@ void EventList::add_event(void)
 	}
 }
 
+void EventList::remove_event(void)
+{
+	string name;
+	cout << "Enter the name of the event you would like to remove {!q to cancel}: ";
+	getline(cin, name);
+	if (name != "!q"){
+		if (!remove_flight(name) and !remove_dinner(name) and !remove_yoga(name)){
+			throw name; //TODO can I get away with just throwing a string here?
+		}
+	}
+	return;
+}
+bool EventList::remove_flight(string& name)
+{
+	Flight key_f {Flight(name)}; //list takes a ref as arg to lookup
+	bool ret = flights.remove(key_f);
+	return ret; //stored in local scope for readability
+}
+bool EventList::remove_dinner(string& name)
+{
+	Dinner key_d {Dinner(name)}; //list takes a ref as arg to lookup
+	bool ret = dinners.remove(key_d);
+	return ret; //stored in local scope for readability
+}
+bool EventList::remove_yoga(string& name)
+{
+	Yoga key_y {Yoga(name)}; //list takes a ref as arg to lookup
+	bool ret = yogas.remove(key_y);
+	return ret; //stored in local scope for readability
+}
+
 /*	PRIVATE FUNCTIONS	*/
+bool EventList::creates_name_conflict(const string& new_name) const
+{
+	//LLL::lookup uses T==T, and Event==Event checks for name match
+	if (creates_name_conflict(new_name, flights)
+	 or creates_name_conflict(new_name, dinners)
+	 or creates_name_conflict(new_name, yogas))
+		return true;
+	else
+		return false;
+}
+bool EventList::creates_name_conflict(const string& new_name, const LLL<Flight>& check_list) const
+{
+	Flight key = Flight(new_name);
+	return (bool) check_list.lookup(key);
+}
+bool EventList::creates_name_conflict(const string& new_name, const LLL<Dinner>& check_list) const
+{
+	Dinner key = Dinner(new_name);
+	return (bool) check_list.lookup(key);
+}
+bool EventList::creates_name_conflict(const string& new_name, const LLL<Yoga>& check_list) const
+{
+	Yoga key = Yoga(new_name);
+	return (bool) check_list.lookup(key);
+}
+
 //Uses downcasting to determine event type; flight and dinner may overlap with one of each other,
 //otherwise no overlaps are allowed. Not used currently, but likely to be useful in the future.
-bool EventList::is_in_conflict(Event* event) //check for conflicts before adding a new event
+bool EventList::creates_time_conflict(Event* event) const //check for conflicts before adding a new event
 {
 	if (Flight* fp = dynamic_cast<Flight*>(event); fp)
-		return is_in_conflict(fp);
+		return creates_time_conflict(fp);
 	else if (Dinner* dp = dynamic_cast<Dinner*>(event); dp)
-		return is_in_conflict(dp);
+		return creates_time_conflict(dp);
 	else if (Yoga* yp = dynamic_cast<Yoga*>(event); yp)
-		return is_in_conflict(yp);
+		return creates_time_conflict(yp);
 	else{ //uhoh - no plain old event-type objects allowed, currently
 		auto ex {runtime_error("You must specify the type of the event to add to the EventList!")};
 		throw ex; //this will be seen by programmers who try to misues the class, not by users, ideally
 	}
 }
 //flight may overlap with one dinner but nothing else
-bool EventList::is_in_conflict(Flight* flight)
+bool EventList::creates_time_conflict(Flight* flight) const
 {
 	int dinner_collisions = 0; //increment on collision
 	const int collisions_allowed = 1; //only 1 flight-dinner collision allowed
+
 	for (size_t i = 0; i < flights.length(); ++i){
-		if (flights.at(i) == *flight) //Event::operator==(Event&) checks for overlap
+		if (flights.at(i).overlaps(*flight))
 			return true; //no flight-flight overlaps allowed
 	}
 	for (size_t j = 0; j < dinners.length(); ++j){
-		if (dinners.at(j) == *flight){
+		if (dinners.at(j).overlaps(*flight)){
 			++dinner_collisions;
 			if (dinner_collisions > collisions_allowed)
 				return true; //more than {collisions_allowed} flight-dinner overlaps not allowed
 		}
 	}
 	for (size_t k = 0; k < yogas.length(); ++k){
-		if (yogas.at(k) == *flight)
+		if (yogas.at(k).overlaps(*flight))
 			return true; //no flight-yoga overlaps allowed
 	}
 	return false; //no disallowed collisions if we make it here
 }
-//see is_in_conflict(Flight*), this has the same behavior but swap flight and dinner
-bool EventList::is_in_conflict(Dinner* dinner)
+//see creates_time_conflict(Flight*), this has the same behavior but swap flight and dinner
+bool EventList::creates_time_conflict(Dinner* dinner) const
 {
 	int flight_collisions = 0; //increment on collision
 	const int collisions_allowed = 1; //only 1 flight-dinner collision allowed
 	for (size_t i = 0; i < flights.length(); ++i){
-		if (flights.at(i) == *dinner){ //Event::operator==(Event&) checks for overlap
+		if (flights.at(i).overlaps(*dinner)){
 			++flight_collisions;
 			if (flight_collisions > collisions_allowed)
 				return true; //more than {collisions_allowed} flight-dinner overlaps not allowed
 		}
 	}
 	for (size_t j = 0; j < dinners.length(); ++j){
-		if (dinners.at(j) == *dinner)
+		if (dinners.at(j).overlaps(*dinner))
 			return true; //no dinner-dinner overlaps allowed
 	}
 	for (size_t k = 0; k < yogas.length(); ++k){
-		if (yogas.at(k) == *dinner)
+		if (yogas.at(k).overlaps(*dinner))
 			return true; //no dinner-yoga overlaps allowed
 	}
 	return false; //no disallowed collisions if we make it here
 }
 //simpler - yoga may not overlap with any event type
-bool EventList::is_in_conflict(Yoga* yoga)
+bool EventList::creates_time_conflict(Yoga* yoga) const
 {
 	for (size_t i = 0; i < flights.length(); ++i){
-		if (flights.at(i) == *yoga)
+		if (flights.at(i).overlaps(*yoga))
 			return true; //no overlaps allowed
 	}
 	for (size_t j = 0; j < dinners.length(); ++j){
-		if (dinners.at(j) == *yoga)
+		if (dinners.at(j).overlaps(*yoga))
 			return true; //no overlaps allowed
 	}
 	for (size_t k = 0; k < yogas.length(); ++k){
-		if (yogas.at(k) == *yoga)
+		if (yogas.at(k).overlaps(*yoga))
 			return true; //no overlaps allowed
 	}
 	return false; //no collisions if we make it here
