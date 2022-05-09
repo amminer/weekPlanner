@@ -11,10 +11,6 @@ nPolicy RemoteSigned -Scope CurrentUser'
  *				and associated functions.
  */
 
-/*	IO EXCEPTIONS	*/
-must_be_positive_int::must_be_positive_int(const string& new_message)
-	: invalid_argument(new_message) {}
-
 /*	CLASS EVENT	*/
 /*		CONSTRUCTORS, DESTRUCTORS, helpers		*/
 Event::Event(void)
@@ -348,14 +344,14 @@ bool Flight::setup_from_cin(bool base_set, string checked_in, string carryon_in)
 /*		PRIVATE FUNCTIONS		*/
 void Flight::set_bags_checked(int checked_in){
 	if (checked_in < 0)
-		throw must_be_positive_int(to_string(checked_in));
+		throw invalid_argument(to_string(checked_in));
 	else
 		bags_checked = checked_in;
 }
 
 void Flight::set_bags_carryon(int carryon_in){
 	if (carryon_in < 0)
-		throw must_be_positive_int(to_string(carryon_in));
+		throw invalid_argument(to_string(carryon_in));
 	else
 		bags_carryon = carryon_in;
 }
@@ -447,7 +443,7 @@ void Dinner::set_allergies(const char* allergies_in)
 void Dinner::set_num_guests(int guests_in)
 {
 	if (guests_in < 0)
-		throw must_be_positive_int(to_string(guests_in));
+		throw invalid_argument(to_string(guests_in));
 	else
 		num_guests = guests_in;
 }
@@ -517,7 +513,7 @@ bool Yoga::setup_from_cin(bool base_set, string bpm_in, string skill_in)
 void Yoga::set_resting_heart_rate(int bpm_in)
 {
 	if (bpm_in <=0)
-		throw must_be_positive_int(to_string(bpm_in));
+		throw invalid_argument(to_string(bpm_in));
 	else
 		resting_heart_rate = bpm_in;
 }
@@ -525,7 +521,7 @@ void Yoga::set_resting_heart_rate(int bpm_in)
 void Yoga::set_skill_level(int skill_in)
 {
 	if (skill_in <= 0)
-		throw must_be_positive_int(to_string(skill_in));
+		throw invalid_argument(to_string(skill_in));
 	else
 		skill_level = skill_in; //accepts braggart values (>10)
 }

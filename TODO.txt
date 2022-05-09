@@ -1,5 +1,3 @@
-Implement planner (keeps a collection of eventlists to represent upcoming weeks in chronological order)
-
 Convert Node and DLL to use unique_ptr (can't blame me for importing these from last assignment)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

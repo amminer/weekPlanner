@@ -21,9 +21,6 @@
  */
 
 /*	CONSTRUCTORS	*/
-EventList::EventList(void)
-	: week_num(-1) {}
-
 EventList::EventList(int week_num_in)
 	: week_num(week_num_in) {}
 
@@ -31,7 +28,13 @@ EventList::EventList(int week_num_in)
 ostream& operator<<(ostream& out, EventList& op2)
 {	
 	out << "\nWeek " << op2.week_num << ":\n";
-	op2.display_chronological();
+	if (	op2.flights.is_empty()
+		and op2.dinners.is_empty()
+		and op2.yogas.is_empty()  ){
+		cout << "No events this week - add some!\n";
+	}
+	else
+		op2.display_chronological();
 	return out;
 }
 //Displays all events in chron. order, regardless of event type.
@@ -64,18 +67,17 @@ void EventList::display_chronological(size_t flights_index, size_t dinners_index
 		Event* min_event = to_comp.at(distance(actually_comp.begin(), min_event_iterator));
 		//print it and increment its index
 		if (Flight* fp = dynamic_cast<Flight*>(min_event); fp){
-			cout << *fp;
+			cout << '\n' << *fp << '\n';
 			++flights_index;
 		}
 		else if (Dinner* dp = dynamic_cast<Dinner*>(min_event); dp){
-			cout << *dp;
+			cout << '\n' << *dp << '\n';
 			++dinners_index;
 		}
 		else if (Yoga* yp = dynamic_cast<Yoga*>(min_event); yp){
-			cout << *yp;
+			cout << '\n' << *yp << '\n';
 			++yogas_index;
 		}
-		cout << "\n\n";
 		//recurse with its type_index incremented by 1 until all indices >= their list's len
 		return display_chronological(flights_index, dinners_index, yogas_index);
 	}
@@ -86,7 +88,7 @@ void EventList::add_event(void)
 {
 	string type;
 	string new_name; //used to check for name conflicts after event creation
-	cout << "\n(Options are flight, dinner, or yoga)\n"
+	cout << "(Options are flight, dinner, or yoga)\n"
 		 << "Choose an event type {!q to cancel}: ";
 	getline(cin, type);
 	try{
@@ -143,7 +145,7 @@ void EventList::remove_event(void)
 	getline(cin, name);
 	if (name != "!q"){
 		if (!remove_flight(name) and !remove_dinner(name) and !remove_yoga(name)){
-			throw name; //TODO can I get away with just throwing a string here?
+			throw name; //is it worth throwing a string? Calling code already knows name
 		}
 	}
 	return;
@@ -206,7 +208,7 @@ bool EventList::creates_time_conflict(Event* event) const //check for conflicts 
 		return creates_time_conflict(yp);
 	else{ //uhoh - no plain old event-type objects allowed, currently
 		auto ex {runtime_error("You must specify the type of the event to add to the EventList!")};
-		throw ex; //this will be seen by programmers who try to misues the class, not by users, ideally
+		throw ex; //this will be seen by programmers who try to misue the class, not by users, ideally
 	}
 }
 //flight may overlap with one dinner but nothing else

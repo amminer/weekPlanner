@@ -17,7 +17,7 @@
 class EventList
 {
 	public:
-		EventList(void);
+		//EventList(void); //not needed?
 		EventList(int);
 		//default destructor and cpy constr are ok, no dyn mem
 

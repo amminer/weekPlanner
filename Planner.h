@@ -27,8 +27,15 @@ class Planner
 		Planner(void); //called by main loop
 		//default destructor and cpy constr are ok, no dyn mem
 
+		void help(void); 		 //loosely explains the concept of the program
+		size_t size(void);		 //returns number of weeks in planner
+		void add_week(void);	 //add a page to the planner
+		void print_week(size_t); //print week specified by number
+		void add_event(size_t);	 //adds an event to the week specified
+		void remove_event(size_t); //user prompted for name of event to remove
+
 	private:
 		list<EventList> weeks;
 
-		help(void); //loosely explains how to use the program
+		EventList* week(size_t); //access by weeknum
 };

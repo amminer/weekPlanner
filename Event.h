@@ -22,12 +22,6 @@ using namespace std;
  *				are for operator overloading practice.
  */
 
-/*	IO EXCEPTIONS	*/
-struct must_be_positive_int: public invalid_argument
-{
-	must_be_positive_int(const string& new_message="");
-};
-
 class Event
 {
 	public:
