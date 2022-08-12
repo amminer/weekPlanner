@@ -250,7 +250,7 @@ void Event::set_name(const string& in_name)
 }
 
 //Enforces start <= stop
-void Event::set_start(string& new_weekday, string& new_time)
+void Event::set_start(const string& new_weekday, const string& new_time)
 {
 	WeekdayTime new_start {
 		WeekdayTime(string_to_weekday(new_weekday),
@@ -266,7 +266,7 @@ void Event::set_start(string& new_weekday, string& new_time)
 }
 
 //Enforces stop >= start
-void Event::set_stop(string& new_weekday, string& new_time)
+void Event::set_stop(const string& new_weekday, const string& new_time)
 {
 	WeekdayTime new_stop {
 		WeekdayTime(string_to_weekday(new_weekday),
@@ -343,14 +343,14 @@ bool Flight::setup_from_cin(bool base_set, string checked_in, string carryon_in)
 }
 
 /*		PRIVATE FUNCTIONS		*/
-void Flight::set_bags_checked(int checked_in){
+void Flight::set_bags_checked(const int checked_in){
 	if (checked_in < 0)
 		throw invalid_argument(to_string(checked_in));
 	else
 		bags_checked = checked_in;
 }
 
-void Flight::set_bags_carryon(int carryon_in){
+void Flight::set_bags_carryon(const int carryon_in){
 	if (carryon_in < 0)
 		throw invalid_argument(to_string(carryon_in));
 	else
@@ -440,7 +440,7 @@ void Dinner::set_allergies(const char* allergies_in)
 	strcpy(food_allergies, allergies_in);
 }
 
-void Dinner::set_num_guests(int guests_in)
+void Dinner::set_num_guests(const int guests_in)
 {
 	if (guests_in < 0)
 		throw invalid_argument(to_string(guests_in));
@@ -510,7 +510,7 @@ bool Yoga::setup_from_cin(bool base_set, string bpm_in, string skill_in)
 }
 
 /*		PRIVATE FUNCTIONS		*/
-void Yoga::set_resting_heart_rate(int bpm_in)
+void Yoga::set_resting_heart_rate(const int bpm_in)
 {
 	if (bpm_in <=0)
 		throw invalid_argument(to_string(bpm_in));
@@ -518,7 +518,7 @@ void Yoga::set_resting_heart_rate(int bpm_in)
 		resting_heart_rate = bpm_in;
 }
 
-void Yoga::set_skill_level(int skill_in)
+void Yoga::set_skill_level(const int skill_in)
 {
 	if (skill_in <= 0)
 		throw invalid_argument(to_string(skill_in));

@@ -65,10 +65,10 @@ class WeekdayTime
 {
 	public:
 		WeekdayTime(void);
-		WeekdayTime(string, int, int); //this constructor is called with user input;
-		WeekdayTime(string, int);	   //the following constructors are analogous but
-		WeekdayTime(Weekday, int, int);//used internally (in class Event)
-		WeekdayTime(Weekday, int);
+		WeekdayTime(const string, const int, const int); //this constructor is called with user input;
+		WeekdayTime(const string, const int);	   //the following constructors are analogous but
+		WeekdayTime(const Weekday, const int, const int);//used internally (in class Event)
+		WeekdayTime(const Weekday, const int);
 
 		bool operator==(const WeekdayTime&) const; //check for overlapping times
 		bool operator!=(const WeekdayTime&) const; //see above

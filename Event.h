@@ -30,7 +30,7 @@ class Event
 		//used to initialize an event for storage in practice
 		Event(const string); //arg is not ref so it can handle string literals
 		Event(const string&, const string&);	//for creating a key to lookup in template DLL
-		Event(Weekday, int, int, Weekday, int, int, string, string); //for testing
+		Event(const Weekday, const int, const int, const Weekday, const int, const int, const string, const string); //for testing
 		Event(const Event&);
 		virtual ~Event();
 
@@ -65,8 +65,8 @@ class Event
 		//validation/setter functions called by setup func(s)
 		void set_name(const char*); //also used by copy constructor
 		void set_name(const string&); //wrapper for set_name(const char*)
-		void set_start(string&, string&);
-		void set_stop(string&, string&);
+		void set_start(const string&, const string&);
+		void set_stop(const string&, const string&);
 };
 
 class Dinner; //Flight depends on Dinner - further declared below
@@ -88,8 +88,8 @@ class Flight: public Event
 		int bags_checked;
 		int bags_carryon;
 
-		void set_bags_checked(int checked_in);
-		void set_bags_carryon(int carryon_in);
+		void set_bags_checked(const int checked_in);
+		void set_bags_carryon(const int carryon_in);
 };
 
 //Dinner depends on Flight - declared above.
@@ -111,7 +111,7 @@ class Dinner: public Event
 		int num_guests;
 		char* food_allergies;	//requirements list a derived char*
 
-		void set_num_guests(int guests_in);
+		void set_num_guests(const int guests_in);
 		void set_allergies(string& allergies_in);
 		void set_allergies(const char* allergies_in);
 };
@@ -131,6 +131,6 @@ class Yoga: public Event
 		int resting_heart_rate;		//safety reasons
 		int skill_level;
 
-		void set_resting_heart_rate(int bpm_in);
-		void set_skill_level(int skill_in);
+		void set_resting_heart_rate(const int bpm_in);
+		void set_skill_level(const int skill_in);
 };

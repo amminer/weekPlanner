@@ -29,13 +29,13 @@ class Planner
 		//default destructor and cpy constr are ok, no dyn mem
 
 		size_t size(void) const;		//returns number of weeks in planner
-		void add_weeks(size_t);	 		//add pages to the planner
-		void print_week(size_t); 		//print week specified by number
-		void add_event(size_t);	 		//adds an event to the week specified
-		void remove_event(size_t); 		//user prompted for name of event to remove
+		void add_weeks(const size_t);	 		//add pages to the planner
+		void print_week(const size_t); 		//print week specified by number
+		void add_event(const size_t);	 		//adds an event to the week specified
+		void remove_event(const size_t); 		//user prompted for name of event to remove
 
 	private:
 		list<EventList> weeks;
 
-		EventList* week(size_t); //access by weeknum
+		EventList* week(const size_t); //access by weeknum
 };

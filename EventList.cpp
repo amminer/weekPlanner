@@ -25,7 +25,7 @@ EventList::EventList(int week_num_in)
 	: week_num(week_num_in) {}
 
 /*	OPERATORS	*/
-ostream& operator<<(ostream& out, EventList& op2)
+ostream& operator<<(ostream& out, const EventList& op2)
 {	
 	out << "\nWeek " << op2.week_num << ":\n";
 	if (	op2.flights.is_empty()
@@ -150,19 +150,19 @@ void EventList::remove_event(void)
 	}
 	return;
 }
-bool EventList::remove_flight(string& name)
+bool EventList::remove_flight(const string& name)
 {
 	Flight key_f {Flight(name)}; //list takes a ref as arg to lookup
 	bool ret = flights.remove(key_f);
 	return ret; //stored in local scope for readability
 }
-bool EventList::remove_dinner(string& name)
+bool EventList::remove_dinner(const string& name)
 {
 	Dinner key_d {Dinner(name)}; //list takes a ref as arg to lookup
 	bool ret = dinners.remove(key_d);
 	return ret; //stored in local scope for readability
 }
-bool EventList::remove_yoga(string& name)
+bool EventList::remove_yoga(const string& name)
 {
 	Yoga key_y {Yoga(name)}; //list takes a ref as arg to lookup
 	bool ret = yogas.remove(key_y);
@@ -212,7 +212,7 @@ bool EventList::creates_time_conflict(Event* event) const //check for conflicts 
 	}
 }
 //flight may overlap with one dinner but nothing else
-bool EventList::creates_time_conflict(Flight* flight) const
+bool EventList::creates_time_conflict(const Flight* flight) const
 {
 	int dinner_collisions = 0; //increment on collision
 	const int collisions_allowed = 1; //only 1 flight-dinner collision allowed
@@ -235,7 +235,7 @@ bool EventList::creates_time_conflict(Flight* flight) const
 	return false; //no disallowed collisions if we make it here
 }
 //see creates_time_conflict(Flight*), this has the same behavior but swap flight and dinner
-bool EventList::creates_time_conflict(Dinner* dinner) const
+bool EventList::creates_time_conflict(const Dinner* dinner) const
 {
 	int flight_collisions = 0; //increment on collision
 	const int collisions_allowed = 1; //only 1 flight-dinner collision allowed
@@ -243,7 +243,9 @@ bool EventList::creates_time_conflict(Dinner* dinner) const
 		if (flights.at(i).overlaps(*dinner)){
 			++flight_collisions;
 			if (flight_collisions > collisions_allowed)
-				return true; //more than {collisions_allowed} flight-dinner overlaps not allowed
+				return true; // more than {collisions_allowed} flight-dinner overlaps not allowed
+				//should I allow all flight-dinner overlaps? This may be the behavior I'm looking for...
+				//TODO retrospective after final submission
 		}
 	}
 	for (size_t j = 0; j < dinners.length(); ++j){
@@ -257,7 +259,7 @@ bool EventList::creates_time_conflict(Dinner* dinner) const
 	return false; //no disallowed collisions if we make it here
 }
 //simpler - yoga may not overlap with any event type
-bool EventList::creates_time_conflict(Yoga* yoga) const
+bool EventList::creates_time_conflict(const Yoga* yoga) const
 {
 	for (size_t i = 0; i < flights.length(); ++i){
 		if (flights.at(i).overlaps(*yoga))

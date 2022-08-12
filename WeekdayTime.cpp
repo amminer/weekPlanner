@@ -97,7 +97,7 @@ uint string_to_min(string timestring)
 }
 
 //converts hour & minute input into minutes-from-midnight output
-uint hhmm_to_m(int hr, int min)
+uint hhmm_to_m(const int hr, const int min)
 {
 	if (hr <= 0)
 		return (uint) min;
@@ -108,9 +108,9 @@ uint hhmm_to_m(int hr, int min)
 //converts minutes-from-midnight input into hour & minute output
 string m_to_hhmm(uint out_min, int out_hr)
 {
-	if (out_min < 0)		//leaving error case in just in case - 
-		return "ERROR";		//if you can get my program to do this from the UI
-	else if (out_min <= 9)  //show me how and I'll buy you a coffee
+	if (out_min < 0)
+		return "ERROR";
+	else if (out_min <= 9)
 		return to_string(out_hr) + ":0" + to_string(out_min);
 	else if (out_min < 60)
 		return to_string(out_hr) + ':' + to_string(out_min);
@@ -122,19 +122,19 @@ WeekdayTime::WeekdayTime(void)
 	: weekday(sunday), minute(0) {}
 
 //should only be used if you've converted a time to minutes-from-midnight
-WeekdayTime::WeekdayTime(Weekday in_weekday, int in_minute)
+WeekdayTime::WeekdayTime(const Weekday in_weekday, const int in_minute)
 	:weekday(in_weekday), minute(in_minute) {}
 
 //should be called with a 24-hour hour and a minute-within-that-hour
-WeekdayTime::WeekdayTime(Weekday in_weekday, int in_hour, int in_minute)
+WeekdayTime::WeekdayTime(const Weekday in_weekday, const int in_hour, const int in_minute)
 	:weekday(in_weekday), minute(hhmm_to_m(in_hour, in_minute)) {}
 
 //should only be used if you've converted a time to minutes-from-midnight
-WeekdayTime::WeekdayTime(string in_weekday, int in_minute)
+WeekdayTime::WeekdayTime(const string in_weekday, const int in_minute)
 	:weekday(string_to_weekday(in_weekday)), minute(in_minute) {}
 
 //should be called with a 24-hour hour and a minute-within-that-hour
-WeekdayTime::WeekdayTime(string in_weekday, int in_hour, int in_minute)
+WeekdayTime::WeekdayTime(const string in_weekday, const int in_hour, const int in_minute)
 	:weekday(string_to_weekday(in_weekday)), minute(hhmm_to_m(in_hour, in_minute)) {}
 
 bool WeekdayTime::operator==(const WeekdayTime& op2) const

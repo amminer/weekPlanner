@@ -41,12 +41,12 @@ size_t Planner::size(void) const
 	return weeks.size();
 }
 
-void Planner::print_week(size_t week_num)
+void Planner::print_week(const size_t week_num)
 {
 	cout << *this->week(week_num);
 }
 
-void Planner::add_weeks(size_t num_weeks)
+void Planner::add_weeks(const size_t num_weeks)
 {
 	if (num_weeks <= 0){
 		return;
@@ -61,12 +61,12 @@ void Planner::add_weeks(size_t num_weeks)
 //arg for future extensibility, could add multiple events
 //or could allow addition of an event to a different week
 //than the current week in the main loop if needed
-void Planner::add_event(size_t week_num)
+void Planner::add_event(const size_t week_num)
 {
 	week(week_num)->add_event();
 }
 
-void Planner::remove_event(size_t week_num)
+void Planner::remove_event(const size_t week_num)
 {
 	try{
 		week(week_num)->remove_event();
@@ -79,7 +79,7 @@ void Planner::remove_event(size_t week_num)
 /*	PRIVATER FUNCTIONS	*/
 
 //access the week/EventList at index week_num-1
-EventList* Planner::week(size_t week_num)
+EventList* Planner::week(const size_t week_num)
 {
 	if (week_num > weeks.size())
 		return nullptr;
@@ -94,7 +94,7 @@ EventList* Planner::week(size_t week_num)
 
 //changes all invalid inputs to 0 for error check since
 //zero is never a valid option in the main loop.
-int get_size_t(size_t min=0, size_t max=pow(2, 16)) //size_t min 16bit precision
+int get_size_t(const size_t min=0, const size_t max=pow(2, 16)) //size_t min 16bit precision
 {
 	int ret;
 	cin >> ret;

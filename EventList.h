@@ -21,7 +21,7 @@ class EventList
 		EventList(int);
 		//default destructor and cpy constr are ok, no dyn mem
 
-		friend ostream& operator<<(ostream&, EventList&); //instead of display()...
+		friend ostream& operator<<(ostream&, const EventList&); //instead of display()...
 
 		//these use exception handling, no returns needed
 		void add_event(void); //prompts user, inserts to one of the LLL members
@@ -34,17 +34,17 @@ class EventList
 		LLL<Yoga> yogas;
 
 		void display_chronological(size_t=0, size_t=0, size_t=0) const;
-		bool remove_flight(string&);
-		bool remove_dinner(string&);
-		bool remove_yoga(string&);
+		bool remove_flight(const string&);
+		bool remove_dinner(const string&);
+		bool remove_yoga(const string&);
 		bool creates_name_conflict(const string& new_name) const; //wrapper, calls each of the following:
 		bool creates_name_conflict(const string& new_name, const LLL<Flight>& check_list) const; //returning true if any
 		bool creates_name_conflict(const string& new_name, const LLL<Dinner>& check_list) const; //of these helpers
 		bool creates_name_conflict(const string& new_name, const LLL<Yoga>& check_list) const;   //return true.
 		bool creates_time_conflict(Event*) const;   //wrapper; based on input subtype, calls...
-		bool creates_time_conflict(Flight*) const;  //...this,
-		bool creates_time_conflict(Dinner*) const;  //or this,
-		bool creates_time_conflict(Yoga*) const;    //or this to allow some overlaps but not others.
+		bool creates_time_conflict(const Flight*) const;  //...this,
+		bool creates_time_conflict(const Dinner*) const;  //or this,
+		bool creates_time_conflict(const Yoga*) const;    //or this to allow some overlaps but not others.
 		//these bools could be void and throw exceptions, but I already wrote exception handling into events
 		//so I can just do it this way right? Hope this is ok!
 };
